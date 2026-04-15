@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitMall Mapper</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+            background-color: #222; /* Prevents white flash during loading */
+        }
+
+        /* --- THE CSS TRICK --- */
+        /* This class is toggled by JavaScript. It targets the images inside the map. */
+        .dark-mode-map .leaflet-tile-pane {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 16px;
+            background-color: #ffffff;
+            color: #111111;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="theme-toggle" id="themeToggleBtn">🌙 Dark Mode</button>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. Initialize Map
+        const map = L.map('map').setView([3.1390, 101.6869], 11);
+
+        // 2. Define ONLY the Standard OpenStreetMap Layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 3. Implement Toggle Logic using CSS Classes
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const mapContainer = document.getElementById('map');
+        let isDarkMode = false;
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (isDarkMode) {
+                // Switch to Light Mode
+                mapContainer.classList.remove('dark-mode-map');
+                themeToggleBtn.innerText = "🌙 Dark Mode";
+                themeToggleBtn.style.backgroundColor = "#ffffff";
+                themeToggleBtn.style.color = "#111111";
+            } else {
+                // Switch to Dark Mode
+                mapContainer.classList.add('dark-mode-map');
+                themeToggleBtn.innerText = "☀️ Light Mode";
+                themeToggleBtn.style.backgroundColor = "#222222";
+                themeToggleBtn.style.color = "#ffffff";
+            }
+            isDarkMode = !isDarkMode;
+        });
+    </script>
+</body>
+</html>
