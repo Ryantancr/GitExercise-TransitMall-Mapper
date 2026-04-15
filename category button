@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitMall Mapper | Student Transit Directory</title>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Filter Button Container */
+        .filter-container {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* The Buttons */
+        .filter-btn {
+            padding: 10px 22px;
+            border: 2px solid #2563eb;
+            border-radius: 30px;
+            background-color: transparent;
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        /* Active/Hover State */
+        .filter-btn:hover, 
+        .filter-btn.active {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Map Placeholder (Where ZheShern's Leaflet map will live) */
+        #map-placeholder {
+            height: 500px;
+            margin: 20px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 2px dashed #999;
+            color: #666;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TransitMall Mapper</h1>
+        <p>Find malls along the MRT lines without a car!</p>
+    </header>
+
+    <div class="filter-container">
+        <button class="filter-btn active" data-category="all">All Malls</button>
+        <button class="filter-btn" data-category="grocery">🛒 Groceries</button>
+        <button class="filter-btn" data-category="cinema">🎬 Cinema</button>
+        <button class="filter-btn" data-category="study">📚 Study Spots</button>
+    </div>
+
+    <div id="map-placeholder">
+        [ Leaflet.js Map will be rendered here by ZheShern ]
+    </div>
+
+    <script>
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const mapDisplay = document.getElementById('map-placeholder');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                
+                // 1. Update UI: Remove active class from others, add to this one
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // 2. Get the category from the data attribute
+                const category = button.getAttribute('data-category');
+                
+                // 3. Temporary logic to show it's working
+                mapDisplay.innerHTML = `Filtering map for: <strong>${category.toUpperCase()}</strong>`;
+                
+                // 4. This is the link to ZheShern's work
+                if (typeof filterMapMarkers === "function") {
+                    filterMapMarkers(category);
+                }
+            });
+        });
+
+        // This function will be filled with Leaflet code later
+        function filterMapMarkers(category) {
+            console.log("Team Update: Map is now showing " + category);
+        }
+    </script>
+
+</body>
+</html>
