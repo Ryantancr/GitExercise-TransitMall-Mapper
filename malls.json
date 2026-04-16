@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "mall_name": "The Exchange TRX",
+    "station": "TRX Station",
+    "line": "Kajang & Putrajaya Line",
+    "best_exit": "Exit B (Direct Connection)",
+    "walking_time_mins": 2,
+    "categories": ["Premium", "Food Court", "Photography Spots"],
+    "coordinates": {"lat": 3.1425, "lon": 101.7190}
+  },
+  {
+    "id": 2,
+    "mall_name": "Pavilion Bukit Bintang",
+    "station": "Bukit Bintang Station",
+    "line": "Kajang Line",
+    "best_exit": "Exit D (Walk through Lot 10)",
+    "walking_time_mins": 5,
+    "categories": ["Cinemas", "Shopping", "Student Dining"],
+    "coordinates": {"lat": 3.1480, "lon": 101.7145}
+  },
+  {
+    "id": 3,
+    "mall_name": "1 Utama Shopping Centre",
+    "station": "Bandar Utama Station",
+    "line": "Kajang Line",
+    "best_exit": "Exit B (Skybridge)",
+    "walking_time_mins": 5,
+    "categories": ["Entertainment", "Large Variety", "Good Study Spots"],
+    "coordinates": {"lat": 3.1488, "lon": 101.6158}
+  }
+]
