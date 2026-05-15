@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitMall Mapper | Student Transit Directory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-dark: #1d4ed8;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-700: #334155;
+            --slate-900: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--slate-50);
+            color: var(--slate-900);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Global Header --- */
+        header {
+            background: linear-gradient(135deg, var(--slate-900) 0%, #1e293b 100%);
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            z-index: 20;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .admin-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* --- Layout Container --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Refined Sidebar --- */
+        .sidebar {
+            background-color: white;
+            border-right: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.02);
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--slate-100);
+        }
+
+        .sidebar-section h2 {
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Live Search Bar */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 10px 10px 36px;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            background-color: var(--slate-50);
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Custom Categories Grid */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 10px 12px;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            background-color: white;
+            color: var(--slate-700);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--slate-50);
+            border-color: var(--slate-700);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Quick Transit Routing Area */
+        .routing-preview {
+            background: var(--slate-50);
+            border: 1px dashed var(--slate-200);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 0.85rem;
+            color: var(--slate-700);
+        }
+
+        /* Community Tips UI */
+        .tips-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding-right: 4px;
+        }
+
+        .tip-card {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .tip-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .tip-card p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--slate-700);
+            line-height: 1.4;
+        }
+
+        .tip-form input, .tip-form textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .tip-form button {
+            width: 100%;
+            background: var(--slate-900);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tip-form button:hover {
+            background: var(--primary);
+        }
+
+        /* --- Map Viewport --- */
+        .map-wrapper {
+            position: relative;
+            background-color: #cbd5e1;
+        }
+
+        #map-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .map-floating-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 30;
+        }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 400px;
+            }
+            .sidebar { border-right: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1><i class="fa-solid fa-train-subway" style="color: #3b82f6;"></i> TransitMall Mapper</h1>
+            <p>Klang Valley Transit Student Directory</p>
+        </div>
+        <a href="admin.html" class="admin-link"><i class="fa-solid fa-sliders"></i> Admin Dashboard</a>
+    </header>
+
+    <main class="app-container">
+        
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            
+            <!-- Search & Filters -->
+            <div class="sidebar-section">
+                <h2><i class="fa-solid fa-magnifying-glass"></i> Find Your Destination</h2>
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" class="search-input" id="mallSearch" placeholder="Search malls or stations...">
+                </div>
+                <div class="filter-grid">
+                    <button class="filter-btn active" data-category="all">📍 All Malls</button>
+                    <button class="filter-btn" data-category="grocery">🛒 Groceries</button>
+                    <button class="filter-btn" data-category="cinema">🎬 Cinemas</button>
+                    <button class="filter-btn" data-category="study">📚 Study Spots</button>
+                </div>
+            </div>
+
+            <!-- Route Info (Quick Transit Routing Feature) -->
+            <div class="sidebar-section">
+                <h2><i class="fa-solid fa-route"></i> Quick Transit Route</h2>
+                <div class="routing-preview" id="routePreview">
+                    <p style="margin:0; color: #64748b;"><i class="fa-solid fa-info-circle"></i> Click a mall marker on the map to see station exits, walking distances, and feeder bus rules instantly.</p>
+                </div>
+            </div>
+
+            <!-- Community Feed -->
+            <div class="sidebar-section" style="border-bottom: none; flex: 1;">
+                <h2><i class="fa-solid fa-comments"></i> Student Transit Tips</h2>
+                
+                <div class="tips-feed" id="tipsFeed">
+                    <div class="tip-card">
+                        <div class="tip-meta">
+                            <span>📍 Sunway Velocity</span>
+                            <span>@CommuterElf</span>
+                        </div>
+                        <p>Take Maluri MRT Exit B! There's an underground walkway directly into the basement levels so you completely dodge the sun or rain.</p>
+                    </div>
+                </div>
+
+                <form class="tip-form" id="uiTipForm">
+                    <input type="text" id="uiTipLoc" placeholder="Mall or Station Name" required>
+                    <textarea id="uiTipTxt" rows="2" placeholder="Drop a helpful tip or shortcut..." required></textarea>
+                    <button type="submit">Post to Community</button>
+                </form>
+            </div>
+
+        </aside>
+
+        <!-- Map Space -->
+        <section class="map-wrapper">
+            <!-- Floating Indicator badge on top of the map map -->
+            <div class="map-floating-badge">
+                <i class="fa-solid fa-circle" style="color: #10b981; font-size: 0.6rem;"></i>
+                <span id="activeFilterBadge">Showing: All Malls</span>
+            </div>
+            
+            <div id="map-placeholder">
+                <i class="fa-regular fa-map style" style="font-size: 3rem; color: #94a3b8; margin-bottom: 12px;"></i>
+                <div>[ Leaflet.js Interactive Map Viewport ]</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Map rendering will be powered by ZheShern</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Category Toggling and Badge Sync
+        const filterButtons = document.querySelectorAll('.filter-grid .filter-btn');
+        const activeFilterBadge = document.getElementById('activeFilterBadge');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const category = button.getAttribute('data-category');
+                activeFilterBadge.textContent = `Showing: ${button.textContent.trim()}`;
+                
+                if (typeof filterMapMarkers === "function") {
+                    filterMapMarkers(category);
+                }
+            });
+        });
+
+        // Search Input simulation logic
+        document.getElementById('mallSearch').addEventListener('input', (e) => {
+            console.log(`Searching database for matching text: "${e.target.value}"`);
+        });
+
+        // Interactive UI Tip Submissions
+        document.getElementById('uiTipForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const location = document.getElementById('uiTipLoc').value;
+            const text = document.getElementById('uiTipTxt').value;
+
+            const card = document.createElement('div');
+            card.className = 'tip-card';
+            card.innerHTML = `
+                <div class="tip-meta">
+                    <span>📍 ${location}</span>
+                    <span>@You (Just Now)</span>
+                </div>
+                <p>${text}</p>
+            `;
+
+            const feed = document.getElementById('tipsFeed');
+            feed.insertBefore(card, feed.firstChild);
+            document.getElementById('uiTipForm').reset();
+        });
+
+        function filterMapMarkers(category) {
+            console.log("Communication Link -> Filtering map layer to display items matching: " + category);
+        }
+    </script>
+</body>
+</html>
