@@ -1,38 +1,120 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Function to read our JSON database
+# ==========================================
+# DATABASE HELPER FUNCTIONS
+# ==========================================
+
 def load_malls():
     with open('malls.json', 'r') as file:
         return json.load(file)
 
-# ROUTE 1: The main API route that returns all malls
+def save_malls(data):
+    with open('malls.json', 'w') as file:
+        json.dump(data, file, indent=4) 
+
+def load_tips():
+    if not os.path.exists('tips.json'):
+        return []
+    with open('tips.json', 'r') as file:
+        return json.load(file)
+
+def save_tips(data):
+    with open('tips.json', 'w') as file:
+        json.dump(data, file, indent=4)
+
+# ==========================================
+# ROUTE 1: GET ALL MALLS (Zhe Shern's Map)
+# ==========================================
 @app.route('/api/malls', methods=['GET'])
 def get_malls():
     malls_data = load_malls()
     return jsonify(malls_data)
 
-# ROUTE 2: Filter malls by maximum walking time (PROGRESS 3 UPDATE)
+# ==========================================
+# ROUTE 2: FILTER BY WALK TIME
+# ==========================================
 @app.route('/api/malls/walk/<int:max_time>', methods=['GET'])
 def get_malls_by_walk_time(max_time):
     malls_data = load_malls()
+    filtered_malls = [mall for mall in malls_data if mall.get('walking_time_mins', 99) <= max_time]
+            
+    if len(filtered_malls) > 0:
+        return jsonify(filtered_malls)
+    return jsonify({"error": "No malls found within that walking distance"}), 404
+
+# ==========================================
+# ROUTE 3: FILTER BY CATEGORY (Jie Liang's Buttons)
+# ==========================================
+@app.route('/api/malls/category/<string:cat_name>', methods=['GET'])
+def get_malls_by_category(cat_name):
+    malls_data = load_malls()
     filtered_malls = []
     
-    # Loop through and find malls where the walk time is LESS THAN or EQUAL to the requested time
     for mall in malls_data:
-        if mall.get('walking_time_mins', 99) <= max_time:
+        mall_categories = mall.get('categories', [])
+        if cat_name in mall_categories:
             filtered_malls.append(mall)
             
     if len(filtered_malls) > 0:
         return jsonify(filtered_malls)
-    
-    return jsonify({"error": "No malls found within that walking distance"}), 404
+    return jsonify({"error": "No malls found for that category"}), 404
 
-# Start the server
+# ==========================================
+# ROUTE 4: SUBMIT COMMUNITY TIP (POST)
+# ==========================================
+@app.route('/api/tips', methods=['POST'])
+def submit_tip():
+    new_tip_data = request.get_json()
+    
+    if not new_tip_data or 'tip_text' not in new_tip_data:
+        return jsonify({"error": "Invalid data. 'tip_text' is required."}), 400
+
+    tips = load_tips()
+    new_entry = {
+        "id": len(tips) + 1,
+        "mall_name": new_tip_data.get('mall_name', 'General Tip'),
+        "tip_text": new_tip_data['tip_text']
+    }
+    
+    tips.append(new_entry)
+    save_tips(tips)
+    return jsonify({"message": "Tip saved successfully!", "tip": new_entry}), 201 
+
+# ==========================================
+# ROUTE 5 & 6: ADMIN CRUD LOGIC (POST & DELETE)
+# ==========================================
+@app.route('/api/malls', methods=['POST'])
+def add_mall():
+    new_mall = request.get_json()
+    malls_data = load_malls()
+
+    new_id = max(mall['id'] for mall in malls_data) + 1 if malls_data else 1
+    new_mall['id'] = new_id
+
+    malls_data.append(new_mall)
+    save_malls(malls_data)
+    return jsonify({"message": "Mall added successfully", "mall": new_mall}), 201
+
+@app.route('/api/malls/<int:mall_id>', methods=['DELETE'])
+def delete_mall(mall_id):
+    malls_data = load_malls()
+    updated_malls = [mall for mall in malls_data if mall['id'] != mall_id]
+
+    if len(malls_data) == len(updated_malls):
+        return jsonify({"error": "Mall not found"}), 404
+
+    save_malls(updated_malls)
+    return jsonify({"message": f"Mall {mall_id} deleted successfully"}), 200
+
+# ==========================================
+# START THE SERVER (Dodging the Spam on Port 5001)
+# ==========================================
 if __name__ == '__main__':
-    print("Starting TransitMall Mapper Backend...")
-    app.run(debug=True)
+    print("Starting TransitMall Mapper Backend on Port 5001...")
+    app.run(host='0.0.0.0', port=5001, debug=True)
