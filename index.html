@@ -52,6 +52,86 @@
             background-color: #E63946; color: white; text-align: center; 
             padding: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+
+        /* --- CUSTOM POPUP DESIGN --- */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            padding: 5px;
+        }
+        
+        .custom-popup {
+            font-family: sans-serif;
+            min-width: 220px;
+        }
+        
+        .custom-popup h3 {
+            margin: 0 0 5px 0;
+            color: #1D3557;
+            font-size: 16px;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 8px;
+        }
+
+        .station-subtitle {
+            color: #666;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .exit-box {
+            background-color: #F1FAEE;
+            border-left: 4px solid #457B9D;
+            padding: 8px 10px;
+            margin: 12px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .exit-box strong { 
+            color: #1D3557; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .exit-text { 
+            color: #457B9D; 
+            font-weight: bold; 
+            font-size: 14px; 
+            display: block; 
+            margin-top: 4px; 
+        }
+
+        .vibe-container {
+            margin-top: 10px;
+        }
+        
+        .vibe-title {
+            font-size: 11px; 
+            color: #888;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .vibe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            background-color: #E63946;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(230, 57, 70, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -176,9 +256,10 @@
         let activeWalkingPath = null;
         const errorBanner = document.getElementById('errorBanner');
         
-        const RYAN_SERVER_URL = "https://0wbgblvp-5000.asse.devtunnels.ms";
+        // RYAN'S NEW PORT 5001 URL
+        const RYAN_SERVER_URL = "https://0wbgblvp-5001.asse.devtunnels.ms";
 
-        // THE BACKUP DATABASE (Used automatically if Ryan's server drops)
+        // THE BACKUP DATABASE (Used automatically if the server is offline)
         const offlineBackupMalls = [
             { "id": 1, "mall_name": "The Exchange TRX", "station": "TRX Station", "best_exit": "Exit B", "walking_time_mins": 2, "categories": ["Premium", "Food Court"], "coordinates": {"lat": 3.1425, "lon": 101.7190} },
             { "id": 2, "mall_name": "Pavilion Bukit Bintang", "station": "Bukit Bintang Station", "best_exit": "Exit D", "walking_time_mins": 5, "categories": ["Cinemas", "Shopping"], "coordinates": {"lat": 3.1480, "lon": 101.7145} },
@@ -200,15 +281,26 @@
                 let lon = mall.coordinates.lon;
                 
                 let popupHTML = `
-                    <div style="min-width: 180px;">
-                        <b style="font-size: 14px;">${mall.mall_name}</b><br>
-                        🚉 <i>${mall.station}</i><br>
-                        <hr style="margin:8px 0; border: 0; border-top: 1px solid #ccc;">
-                        🚶 <b>Walk Time:</b> ${mall.walking_time_mins} mins<br>
-                        🚪 <b>Route:</b> ${mall.best_exit}<br>
-                        <small style="display:block; margin-top:5px; color:#E63946; font-weight:bold;">
-                            Tags: ${mall.categories.join(', ')}
-                        </small>
+                    <div class="custom-popup">
+                        <h3>🛍️ ${mall.mall_name}</h3>
+                        <div class="station-subtitle">
+                            🚉 <span>${mall.station}</span>
+                        </div>
+                        
+                        <div class="exit-box">
+                            <strong>🚪 Best Route</strong>
+                            <span class="exit-text">${mall.best_exit}</span>
+                            <span style="font-size: 11px; color: #555; display: block; margin-top: 4px;">
+                                ⏱️ ${mall.walking_time_mins} min walk
+                            </span>
+                        </div>
+
+                        <div class="vibe-container">
+                            <span class="vibe-title">✨ Student Vibe</span>
+                            <div class="vibe-tags">
+                                ${mall.categories.map(category => `<span class="tag">${category}</span>`).join('')}
+                            </div>
+                        </div>
                     </div>
                 `;
 
@@ -248,7 +340,7 @@
                     
                     // FALLBACK: Server is offline. Turn banner yellow, tell user, and load backup.
                     errorBanner.style.backgroundColor = "#FCA311";
-                    errorBanner.innerText = "⚠️ OFFLINE MODE: Ryan's Tunnel is down. Displaying local backup data.";
+                    errorBanner.innerText = "⚠️ OFFLINE MODE: Server is currently offline. Displaying local backup data.";
                     errorBanner.style.display = 'block'; 
 
                     // Ensure our backup filter buttons still work even when offline
