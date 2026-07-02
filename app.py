@@ -29,7 +29,7 @@ def save_tips(data):
         json.dump(data, file, indent=4)
 
 # ==========================================
-# ROUTE 1: GET ALL MALLS (Zhe Shern's Map)
+# ROUTE 1: GET ALL MALLS (Zhe Shern / Jie Liang Map)
 # ==========================================
 @app.route('/api/malls', methods=['GET'])
 def get_malls():
@@ -94,7 +94,8 @@ def add_mall():
     new_mall = request.get_json()
     malls_data = load_malls()
 
-    new_id = max(mall['id'] for mall in malls_data) + 1 if malls_data else 1
+    # Safely generate a new ID
+    new_id = max(mall.get('id', 0) for mall in malls_data) + 1 if malls_data else 1
     new_mall['id'] = new_id
 
     malls_data.append(new_mall)
@@ -104,13 +105,42 @@ def add_mall():
 @app.route('/api/malls/<int:mall_id>', methods=['DELETE'])
 def delete_mall(mall_id):
     malls_data = load_malls()
-    updated_malls = [mall for mall in malls_data if mall['id'] != mall_id]
+    # Keep only the malls that DO NOT match the deleted ID
+    updated_malls = [mall for mall in malls_data if mall.get('id') != mall_id]
 
     if len(malls_data) == len(updated_malls):
         return jsonify({"error": "Mall not found"}), 404
 
     save_malls(updated_malls)
     return jsonify({"message": f"Mall {mall_id} deleted successfully"}), 200
+
+# ==========================================
+# ROUTE 7: UPDATE MALL (PUT) - The Missing Piece!
+# ==========================================
+@app.route('/api/malls/<int:mall_id>', methods=['PUT'])
+def update_mall(mall_id):
+    malls_data = load_malls()
+    update_data = request.get_json()
+    
+    for mall in malls_data:
+        if mall.get('id') == mall_id:
+            # Update the specific mall's text data
+            mall['mall_name'] = update_data.get('mall_name', mall.get('mall_name'))
+            mall['station'] = update_data.get('station', mall.get('station'))
+            mall['line'] = update_data.get('line', mall.get('line'))
+            
+            # Smart logic to handle nested or flat coordinates
+            if 'coordinates' in mall:
+                mall['coordinates']['lat'] = update_data.get('latitude', mall['coordinates'].get('lat'))
+                mall['coordinates']['lon'] = update_data.get('longitude', mall['coordinates'].get('lon'))
+            else:
+                mall['latitude'] = update_data.get('latitude', mall.get('latitude'))
+                mall['longitude'] = update_data.get('longitude', mall.get('longitude'))
+                
+            save_malls(malls_data)
+            return jsonify({"message": "Mall successfully updated!", "data": mall}), 200
+            
+    return jsonify({"error": "Mall not found"}), 404
 
 # ==========================================
 # START THE SERVER (Dodging the Spam on Port 5001)
