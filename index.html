@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransitMall Mapper | Dual Theme Edition</title>
+    <title>TransitMall Mapper | Standalone Map Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,14 +14,14 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <style>
-        /* --- DYNAMIC THEME SYSTEM (Light Mode Defaults) --- */
+        /* --- DYNAMIC THEME SYSTEM --- */
         :root {
             --primary: #2563eb; 
             --primary-light: #eff6ff; 
             --primary-dark: #1d4ed8;
             
             --bg-base: #f1f5f9;
-            --bg-panel: #ffffff;
+            --bg-panel: rgba(255, 255, 255, 0.95);
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #cbd5e1;
@@ -31,190 +31,131 @@
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* --- CLAUDE'S DARK MODE --- */
         body.dark-theme {
             --primary: #8b5cf6; 
             --primary-light: #a78bfa; 
             --primary-dark: #7c3aed;
             
             --bg-base: #020617;
-            --bg-panel: #0f172a;
+            --bg-panel: rgba(15, 23, 42, 0.95);
             --text-main: #f8fafc;
             --text-muted: #9ca3af;
             --border-color: #334155;
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
         }
 
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
+        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow: hidden; background-color: var(--bg-base); transition: 0.3s; }
 
-        /* --- Header --- */
-        header { background: var(--bg-panel); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); z-index: 20; transition: 0.3s; }
-        .logo-area h1 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-        .logo-area p { margin: 2px 0 0 0; font-size: 0.8rem; color: var(--text-muted); }
-        .admin-link { color: var(--text-main); text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 8px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: 0.2s; }
-        .admin-link:hover { border-color: var(--primary); color: var(--primary); }
+        /* --- FULLSCREEN MAP --- */
+        #map { width: 100vw; height: 100vh; z-index: 1; }
 
-        /* --- Layout Container --- */
-        .app-container { display: grid; grid-template-columns: 380px 1fr; flex: 1; overflow: hidden; }
+        /* --- FLOATING TOP LEFT (Title & Search) --- */
+        .floating-top-left { position: absolute; top: 20px; left: 20px; z-index: 1001; display: flex; flex-direction: column; gap: 10px; width: 320px; }
+        
+        .map-title { background: var(--bg-panel); padding: 12px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 1.2rem; font-weight: 700; color: var(--text-main); box-shadow: var(--shadow-md); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 10px; }
+        
+        .search-wrapper { position: relative; background: var(--bg-panel); border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-md); backdrop-filter: blur(8px); }
+        .search-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input { width: 100%; padding: 12px 12px 12px 40px; border: none; border-radius: var(--radius-sm); font-size: 0.95rem; background: transparent; color: var(--text-main); box-sizing: border-box; }
+        .search-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3); }
 
-        /* --- Sidebar (Adapts to Light/Dark) --- */
-        .sidebar { background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; z-index: 10; transition: 0.3s; }
-        .sidebar-section { padding: 20px; border-bottom: 1px solid var(--border-color); }
-        .sidebar-section h2 { margin: 0 0 12px 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        /* --- FLOATING TOP RIGHT (Controls) --- */
+        .map-top-right { position: absolute; top: 20px; right: 20px; z-index: 1001; display: flex; flex-direction: column; gap: 10px; }
+        .control-btn { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; box-shadow: var(--shadow-md); transition: all 0.2s ease; background-color: var(--bg-panel); color: var(--text-main); backdrop-filter: blur(8px); }
+        .control-btn:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--primary); }
 
-        .search-wrapper { position: relative; margin-bottom: 16px; }
-        .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-input { width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.9rem; background-color: var(--bg-base); color: var(--text-main); box-sizing: border-box; transition: all 0.2s; }
-        .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
-
-        /* PILL BUTTONS FOR LINE FILTER */
-        .pill-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
-        .pill-scroll-container::-webkit-scrollbar { display: none; }
-        .line-pill { flex-shrink: 0; padding: 6px 14px; border: 1px solid var(--border-color); border-radius: 20px; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        /* --- FLOATING DOCK (Bottom Center Filters) --- */
+        .filter-dock { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); padding: 16px 24px; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); z-index: 1001; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 12px; align-items: center; width: max-content; max-width: 90vw; }
+        
+        .pill-scroll-container { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .line-pill { padding: 6px 16px; border: 1px solid var(--border-color); border-radius: 20px; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .line-pill:hover { border-color: var(--primary-light); color: var(--text-main); }
-        .line-pill.active { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); color: white; border-color: transparent; }
+        .line-pill.active { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); color: white; border-color: transparent; box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4); }
 
-        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-        .filter-btn { padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: var(--bg-base); color: var(--text-main); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .filter-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { padding: 8px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: transparent; color: var(--text-main); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; }
         .filter-btn:hover { border-color: var(--primary-light); }
         .filter-btn.active { background-color: rgba(139, 92, 246, 0.15); color: var(--primary); border-color: var(--primary); }
 
-        .routing-preview { background: var(--bg-base); border: 1px dashed var(--border-color); border-radius: var(--radius-sm); padding: 16px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-
-        .tips-feed { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 12px; padding-right: 4px; }
-        .tip-card { background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; }
-        .tip-meta { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; color: var(--primary); margin-bottom: 4px; }
-        .tip-card p { margin: 0; font-size: 0.8rem; color: var(--text-main); line-height: 1.4; }
-        .tip-form input, .tip-form textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-base); color: var(--text-main); font-size: 0.8rem; margin-bottom: 6px; box-sizing: border-box; }
-        .tip-form button { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-        .tip-form button:hover { background: var(--primary-dark); }
-
-        /* --- Map Controls & Floating UI --- */
-        .map-wrapper { position: relative; width: 100%; height: 100%; background: var(--bg-base); }
-        #map { width: 100%; height: 100%; z-index: 1; }
-        
-        .map-floating-badge { position: absolute; top: 20px; left: 20px; background: var(--bg-panel); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px; z-index: 1001; box-shadow: var(--shadow-md); transition: 0.3s; }
-        
-        .map-top-right { position: absolute; top: 20px; right: 20px; z-index: 1001; display: flex; flex-direction: column; gap: 10px; }
-        .control-btn { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; box-shadow: var(--shadow-md); transition: all 0.2s ease; background-color: var(--bg-panel); color: var(--text-main); }
-        .control-btn:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--primary); }
-        #errorBanner { display: none; position: absolute; top: 0; left: 0; width: 100%; background-color: #f59e0b; color: white; text-align: center; padding: 12px; font-weight: bold; z-index: 9999; }
-
-        /* --- CLAUDE'S LEGEND (Adapts to Light/Dark) --- */
-        .map-legend { position: absolute; bottom: 24px; left: 20px; background: var(--bg-panel); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-main); z-index: 1001; min-width: 180px; box-shadow: var(--shadow-md); transition: 0.3s; }
+        /* --- LEGEND (Bottom Left) --- */
+        .map-legend { position: absolute; bottom: 30px; left: 20px; background: var(--bg-panel); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-main); z-index: 1001; min-width: 180px; box-shadow: var(--shadow-md); backdrop-filter: blur(8px); transition: 0.3s; }
         .legend-title { font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: block; }
         .legend-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
         .legend-item { display: flex; align-items: center; gap: 10px; font-weight: 500; }
         .legend-color { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--bg-panel); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
 
-        /* --- LEAFLET UI OVERRIDES --- */
+        /* --- UI OVERRIDES --- */
+        #errorBanner { display: none; position: absolute; top: 0; left: 0; width: 100%; background-color: #f59e0b; color: white; text-align: center; padding: 12px; font-weight: bold; z-index: 9999; }
         .leaflet-div-icon { background: transparent; border: none; }
         .leaflet-popup-content-wrapper { background: var(--bg-panel); color: var(--text-main); border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-md); transition: 0.3s; }
         .leaflet-popup-tip { background: var(--bg-panel); transition: 0.3s; }
         .leaflet-container a.leaflet-popup-close-button { color: var(--text-muted); top: 8px; right: 8px; }
 
-        @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; grid-template-rows: 1fr 400px; } .sidebar { border-right: none; } }
+        @media (max-width: 768px) {
+            .floating-top-left { width: calc(100% - 40px); }
+            .map-legend { display: none; }
+            .filter-dock { width: calc(100% - 40px); border-radius: 12px; }
+        }
     </style>
 </head>
 <body class="dark-theme">
 
-    <header>
-        <div class="logo-area">
-            <h1><i class="fa-solid fa-train-subway" style="color: var(--primary);"></i> TransitMall Mapper</h1>
-            <p>Klang Valley Transit Student Directory</p>
+    <div id="errorBanner"></div>
+
+    <div class="floating-top-left">
+        <div class="map-title">
+            <i class="fa-solid fa-train-subway" style="color: var(--primary);"></i> TransitMall Mapper
         </div>
-        <a href="login.html" class="admin-link"><i class="fa-solid fa-sliders"></i> Admin Dashboard</a>
-    </header>
+        <div class="search-wrapper">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="search-input" id="mallSearch" placeholder="Search malls, stations, or lines...">
+        </div>
+    </div>
 
-    <main class="app-container">
-        <!-- SIDEBAR WITH PILLS & ORIGINAL SECTIONS -->
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <h2><i class="fa-solid fa-magnifying-glass"></i> Find Your Destination</h2>
-                
-                <div class="search-wrapper">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" class="search-input" id="mallSearch" placeholder="Search malls, stations, or lines...">
-                </div>
+    <div class="map-top-right">
+        <button class="control-btn" id="themeToggleBtn"><i class="fa-solid fa-sun"></i> Light Mode</button>
+        <button class="control-btn" id="locateBtn"><i class="fa-solid fa-location-crosshairs"></i> Locate Me</button>
+    </div>
 
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">Filter By Line</div>
-                <div class="pill-scroll-container" id="lineFilters">
-                    <button class="line-pill active" data-line="all">All Lines</button>
-                    <button class="line-pill" data-line="Kajang">KG</button>
-                    <button class="line-pill" data-line="Putrajaya">PY</button>
-                    <button class="line-pill" data-line="Kelana Jaya">KJ</button>
-                    <button class="line-pill" data-line="Ampang">AG</button>
-                    <button class="line-pill" data-line="Sri Petaling">SP</button>
-                    <button class="line-pill" data-line="Monorail">MR</button>
-                </div>
-
-                <div class="filter-grid" id="categoryFilters">
-                    <button class="filter-btn active" data-category="all">📍 All Malls</button>
-                    <button class="filter-btn" data-category="grocery">🛒 Groceries</button>
-                    <button class="filter-btn" data-category="cinema">🎬 Cinemas</button>
-                    <button class="filter-btn" data-category="study">📚 Study Spots</button>
-                </div>
+    <div class="map-legend">
+        <span class="legend-title">Lines & Markers</span>
+        <div class="legend-grid">
+            <div class="legend-item"><div class="legend-color" style="background-color: #00785B;"></div><span>Kajang Line</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #FFD100;"></div><span>Putrajaya Line</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #E32551;"></div><span>Kelana Jaya Line</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #F58220;"></div><span>Ampang Line</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #7A283B;"></div><span>Sri Petaling Line</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #8CC63F;"></div><span>KL Monorail</span></div>
+        </div>
+        <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
+        <div class="legend-item">
+            <div style="width:14px; height:14px; border-radius:50%; border:2px solid var(--border-color); display:flex; align-items:center; justify-content:center;">
+                <div style="width:4px; height:4px; background:var(--text-muted); border-radius:50%;"></div>
             </div>
+            <span>Interchange</span>
+        </div>
+        <div class="legend-item"><span style="font-size: 1.1rem; margin-right: 2px;">🏬</span><span>Shopping Mall</span></div>
+    </div>
+    
+    <div class="filter-dock">
+        <div class="pill-scroll-container" id="lineFilters">
+            <button class="line-pill active" data-line="all">All Lines</button>
+            <button class="line-pill" data-line="Kajang">KG</button>
+            <button class="line-pill" data-line="Putrajaya">PY</button>
+            <button class="line-pill" data-line="Kelana Jaya">KJ</button>
+            <button class="line-pill" data-line="Ampang">AG</button>
+            <button class="line-pill" data-line="Sri Petaling">SP</button>
+            <button class="line-pill" data-line="Monorail">MR</button>
+        </div>
+        <div class="filter-grid" id="categoryFilters">
+            <button class="filter-btn active" data-category="all">📍 All Malls</button>
+            <button class="filter-btn" data-category="grocery">🛒 Groceries</button>
+            <button class="filter-btn" data-category="cinema">🎬 Cinemas</button>
+            <button class="filter-btn" data-category="study">📚 Study Spots</button>
+        </div>
+    </div>
 
-            <div class="sidebar-section">
-                <h2><i class="fa-solid fa-route"></i> Quick Transit Route</h2>
-                <div class="routing-preview" id="routePreview">
-                    <p style="margin:0;"><i class="fa-solid fa-info-circle"></i> Click a mall marker on the map to see station exits, lines, and walking distances instantly.</p>
-                </div>
-            </div>
-
-            <div class="sidebar-section" style="border-bottom: none; flex: 1;">
-                <h2><i class="fa-solid fa-comments"></i> Student Transit Tips</h2>
-                <div class="tips-feed" id="tipsFeed">
-                    <div class="tip-card">
-                        <div class="tip-meta"><span>📍 Sunway Velocity</span><span>@CommuterElf</span></div>
-                        <p>Take Maluri MRT Exit B! There's an underground walkway directly into the basement levels so you completely dodge the sun or rain.</p>
-                    </div>
-                </div>
-                <form class="tip-form" id="uiTipForm">
-                    <input type="text" id="uiTipLoc" placeholder="Mall or Station Name" required>
-                    <textarea id="uiTipTxt" rows="2" placeholder="Drop a helpful tip or shortcut..." required></textarea>
-                    <button type="submit">Post to Community</button>
-                </form>
-            </div>
-        </aside>
-
-        <section class="map-wrapper">
-            <div id="errorBanner"></div>
-            <div class="map-floating-badge">
-                <i class="fa-solid fa-circle" id="statusDot" style="color: #10b981; font-size: 0.6rem;"></i>
-                <span id="activeFilterBadge">Showing: All Malls</span>
-            </div>
-
-            <div class="map-top-right">
-                <button class="control-btn" id="themeToggleBtn"><i class="fa-solid fa-sun"></i> Light Mode</button>
-                <button class="control-btn" id="locateBtn"><i class="fa-solid fa-location-crosshairs"></i> Locate Me</button>
-            </div>
-
-            <!-- COMPREHENSIVE LEGEND -->
-            <div class="map-legend">
-                <span class="legend-title">Lines & Markers</span>
-                <div class="legend-grid">
-                    <div class="legend-item"><div class="legend-color" style="background-color: #00785B;"></div><span>Kajang Line</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #FFD100;"></div><span>Putrajaya Line</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #E32551;"></div><span>Kelana Jaya Line</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #F58220;"></div><span>Ampang Line</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #7A283B;"></div><span>Sri Petaling Line</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #8CC63F;"></div><span>KL Monorail</span></div>
-                </div>
-                <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
-                <div class="legend-item">
-                    <div style="width:14px; height:14px; border-radius:50%; border:2px solid var(--border-color); display:flex; align-items:center; justify-content:center;">
-                        <div style="width:4px; height:4px; background:var(--text-muted); border-radius:50%;"></div>
-                    </div>
-                    <span>Interchange</span>
-                </div>
-                <div class="legend-item"><span style="font-size: 1.1rem; margin-right: 2px;">🏬</span><span>Shopping Mall</span></div>
-            </div>
-            
-            <div id="map"></div>
-        </section>
-    </main>
+    <div id="map"></div>
 
     <script>
         let mallDatabase = [];
@@ -366,9 +307,7 @@
             return null;
         }
 
-        // ====================================================
-        // 3. FULL-STACK FETCH & POPUP RENDERING
-        // ====================================================
+        // --- 3. FETCH & POPUP RENDERING ---
         const offlineBackupMalls = [
             { "id": 1, "mall_name": "The Exchange TRX", "station": "TRX", "line": "Kajang & Putrajaya Line", "best_exit": "Exit B", "walking_time_mins": 2, "categories": ["Premium", "Food Court"], "coordinates": {"lat": 3.1425, "lon": 101.7190}, "description": "Kuala Lumpur's newest premium lifestyle destination featuring a massive rooftop park and luxury retail.", "operating_hours": "10:00 AM - 10:00 PM" },
             { "id": 2, "mall_name": "Pavilion Bukit Bintang", "station": "Bukit Bintang", "line": "Kajang Line", "best_exit": "Exit D", "walking_time_mins": 5, "categories": ["Cinemas", "Shopping"], "coordinates": {"lat": 3.1480, "lon": 101.7145}, "description": "The crown jewel of Bukit Bintang shopping, famous for luxury boutiques and the Pavilion Crystal Fountain.", "operating_hours": "10:00 AM - 10:00 PM" },
@@ -429,29 +368,13 @@
                             }).addTo(map);
                         }
                     }
-
-                    document.getElementById('routePreview').innerHTML = `
-                        <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
-                            Last-Mile Guide: ${mall.mall_name}
-                        </h3>
-                        <div style="display: grid; grid-template-columns: 20px 1fr; gap: 8px; margin-bottom: 10px; line-height: 1.4;">
-                            <i class="fa-solid fa-train-tram" style="color: var(--text-muted); margin-top: 3px; font-size: 0.85rem;"></i>
-                            <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">1. Take Train Line</strong><br><span style="color:var(--text-main);">${mall.line || 'N/A'}</span></div>
-                            
-                            <i class="fa-solid fa-location-dot" style="color: #ef4444; margin-top: 3px; font-size: 0.85rem;"></i>
-                            <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">2. Alight At Station</strong><br><span style="color:var(--text-main);">${mall.station || 'N/A'}</span></div>
-                            
-                            <i class="fa-solid fa-person-walking" style="color: #10b981; margin-top: 3px; font-size: 0.85rem;"></i>
-                            <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">3. Exit Path</strong><br><span style="color:var(--text-main);">${mall.best_exit || 'Main Exit'} (${mall.walking_time_mins || '5'} mins walk)</span></div>
-                        </div>
-                    `;
                 });
 
                 markerGroup.addLayer(marker);
             });
         }
 
-        // --- 4. Fetch Data & Initialization ---
+        // --- 4. DATA FETCH ---
         function fetchMalls() {
             fetch(backendUrl).then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => { 
@@ -459,8 +382,6 @@
                 renderMapMarkers(mallDatabase); 
             })
             .catch(() => {
-                document.getElementById('statusDot').style.color = "#f59e0b"; 
-                document.getElementById('activeFilterBadge').textContent = "Offline Mode";
                 document.getElementById('errorBanner').style.display = "block";
                 document.getElementById('errorBanner').innerText = "⚠️ OFFLINE MODE: Ryan's Server is down. Using local backup.";
                 mallDatabase = offlineBackupMalls;
@@ -468,14 +389,13 @@
             });
         }
 
-        // --- 5. MASTER FILTERING LOGIC ---
+        // --- 5. FLOATING FILTER LOGIC ---
         function applyFilters() {
             const searchTerm = document.getElementById('mallSearch').value.toLowerCase();
             
             if (mallDatabase.length === 0) return;
 
             let filteredMalls = mallDatabase.filter(mall => {
-                // 1. Category check
                 let catMatch = true;
                 if (activeCategory !== 'all') {
                     let cats = Array.isArray(mall.categories) ? mall.categories : (typeof mall.categories === 'string' ? mall.categories.split(',') : []);
@@ -485,10 +405,8 @@
                     if (activeCategory === 'study') catMatch = lower.some(c => c.includes('study') || c.includes('cafe'));
                 }
 
-                // 2. Line check (from Pill Buttons)
                 let lineMatch = currentLineFilter === 'all' ? true : (mall.line && mall.line.includes(currentLineFilter));
 
-                // 3. Search check
                 let searchMatch = true;
                 if (searchTerm) {
                     searchMatch = (mall.mall_name && mall.mall_name.toLowerCase().includes(searchTerm)) || 
@@ -502,7 +420,6 @@
             renderMapMarkers(filteredMalls);
         }
 
-        // Attach listeners to Line Pills
         document.querySelectorAll('.line-pill').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.line-pill').forEach(b => b.classList.remove('active'));
@@ -512,19 +429,16 @@
             });
         });
 
-        // Attach listener to Search
-        document.getElementById('mallSearch').addEventListener('input', applyFilters);
-
-        // Category Buttons
-        const filterButtons = document.querySelectorAll('.filter-grid .filter-btn');
-        filterButtons.forEach(button => {
+        document.querySelectorAll('.filter-grid .filter-btn').forEach(button => {
             button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.filter-grid .filter-btn').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 activeCategory = button.getAttribute('data-category');
                 applyFilters();
             });
         });
+
+        document.getElementById('mallSearch').addEventListener('input', applyFilters);
 
         // GPS
         document.getElementById('locateBtn').addEventListener('click', () => map.locate({setView: true, maxZoom: 13}));
@@ -541,15 +455,6 @@
                 }
             });
             if (closestMall) setTimeout(() => alert(`GPS LOCATED: The closest mall to you is ${closestMall.mall_name} (${(shortest/1000).toFixed(1)} km away)!`), 600);
-        });
-
-        // Tips
-        document.getElementById('uiTipForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const loc = document.getElementById('uiTipLoc').value; const text = document.getElementById('uiTipTxt').value;
-            const card = document.createElement('div'); card.className = 'tip-card';
-            card.innerHTML = `<div class="tip-meta"><span>📍 ${loc}</span><span>@You</span></div><p>${text}</p>`;
-            document.getElementById('tipsFeed').prepend(card); document.getElementById('uiTipForm').reset();
         });
 
         fetchMalls();
