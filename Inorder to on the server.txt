@@ -1,0 +1,22 @@
+Inorder to on the server
+
+Make sure every file are saved in the same folder
+
+Open VSC
+
+At the terminal type "py app.py"
+
+At the port section type 5001 and visibility change to public
+
+https://298t6s1c-5001.asse.devtunnels.ms/  ---> this is the link
+
+if the link is different 
+
+copy the link
+
+go to homepage2.0 line number291 and paste the link
+
+go to admin html line number74 paste the link
+
+that's all..thankss
+
