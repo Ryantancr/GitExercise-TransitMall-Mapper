@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransitMall Mapper | Student Transit Directory</title>
+    <title>TransitMall Mapper | Dual Theme Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,320 +14,210 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <style>
+        /* --- DYNAMIC THEME SYSTEM (Light Mode Defaults) --- */
         :root {
-            --primary: #2563eb;
-            --primary-light: #eff6ff;
+            --primary: #2563eb; 
+            --primary-light: #eff6ff; 
             --primary-dark: #1d4ed8;
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-700: #334155;
-            --slate-900: #0f172a;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            
+            --bg-base: #f1f5f9;
+            --bg-panel: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            
             --radius-md: 12px;
             --radius-sm: 8px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--slate-50);
-            color: var(--slate-900);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+        /* --- CLAUDE'S DARK MODE --- */
+        body.dark-theme {
+            --primary: #8b5cf6; 
+            --primary-light: #a78bfa; 
+            --primary-dark: #7c3aed;
+            
+            --bg-base: #020617;
+            --bg-panel: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #9ca3af;
+            --border-color: #334155;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
         }
 
-        /* --- Global Header --- */
-        header {
-            background: linear-gradient(135deg, var(--slate-900) 0%, #1e293b 100%);
-            color: white;
-            padding: 14px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-md);
-            z-index: 20;
-        }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
 
-        .logo-area h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo-area p {
-            margin: 2px 0 0 0;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        .admin-link {
-            color: white;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .admin-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
-        }
+        /* --- Header --- */
+        header { background: var(--bg-panel); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); z-index: 20; transition: 0.3s; }
+        .logo-area h1 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+        .logo-area p { margin: 2px 0 0 0; font-size: 0.8rem; color: var(--text-muted); }
+        .admin-link { color: var(--text-main); text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 8px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: 0.2s; }
+        .admin-link:hover { border-color: var(--primary); color: var(--primary); }
 
         /* --- Layout Container --- */
-        .app-container {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            flex: 1;
-            overflow: hidden;
-        }
+        .app-container { display: grid; grid-template-columns: 380px 1fr; flex: 1; overflow: hidden; }
 
-        /* --- Sidebar --- */
-        .sidebar {
-            background-color: white;
-            border-right: 1px solid var(--slate-200);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            z-index: 10;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.02);
-        }
+        /* --- Sidebar (Adapts to Light/Dark) --- */
+        .sidebar { background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; z-index: 10; transition: 0.3s; }
+        .sidebar-section { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section h2 { margin: 0 0 12px 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 
-        .sidebar-section {
-            padding: 20px;
-            border-bottom: 1px solid var(--slate-100);
-        }
+        .search-wrapper { position: relative; margin-bottom: 16px; }
+        .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input { width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.9rem; background-color: var(--bg-base); color: var(--text-main); box-sizing: border-box; transition: all 0.2s; }
+        .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
 
-        .sidebar-section h2 {
-            margin: 0 0 12px 0;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        /* --- STARTING POINT / DESTINATION SEARCH (shared styling) --- */
+        .route-search-wrapper { position: relative; margin-bottom: 0; }
+        .suggestions-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 6px; max-height: 240px; overflow-y: auto; z-index: 1500; box-shadow: var(--shadow-md); }
+        .suggestion-group-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 12px 2px; font-weight: 700; background: var(--bg-base); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; }
+        .suggestion-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; font-size: 0.8rem; color: var(--text-main); border-bottom: 1px solid var(--border-color); }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: var(--bg-base); }
+        .route-badge { display: none; align-items: center; justify-content: space-between; border-radius: var(--radius-sm); padding: 9px 12px; font-size: 0.8rem; color: var(--text-main); margin-top: 12px; border: 1px solid var(--border-color); }
+        .route-badge button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 4px; }
+        .route-badge button:hover { color: #ef4444; }
+        .origin-badge { background: rgba(16, 185, 129, 0.12); border-color: #10b981; }
+        .dest-badge { background: rgba(99, 102, 241, 0.12); border-color: var(--primary); }
+        .use-location-btn { width: 100%; margin-top: 12px; box-sizing: border-box; }
 
-        /* Live Search Bar */
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 12px;
-        }
+        /* --- FIRST-MILE MODE TOGGLE (Walk vs Drive to nearest station) --- */
+        .firstmile-toggle { display: none; margin-top: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
+        .firstmile-toggle-row { display: flex; }
+        .firstmile-toggle-btn { flex: 1; background: var(--bg-base); border: none; padding: 8px 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border-right: 1px solid var(--border-color); transition: 0.15s; }
+        .firstmile-toggle-btn:last-child { border-right: none; }
+        .firstmile-toggle-btn .fm-time { font-size: 0.85rem; font-weight: 800; }
+        .firstmile-toggle-btn.active { background: rgba(16, 185, 129, 0.18); color: #10b981; }
+        .firstmile-toggle-btn:hover:not(.active) { color: var(--text-main); }
+        .firstmile-note { font-size: 0.68rem; color: var(--text-muted); padding: 6px 10px 0 10px; }
 
-        .search-wrapper i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
+        /* PILL BUTTONS FOR LINE FILTER */
+        .pill-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
+        .pill-scroll-container::-webkit-scrollbar { display: none; }
+        .line-pill { flex-shrink: 0; padding: 6px 14px; border: 1px solid var(--border-color); border-radius: 20px; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .line-pill:hover { border-color: var(--primary-light); color: var(--text-main); }
+        .line-pill.active { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); color: white; border-color: transparent; }
 
-        .search-input {
-            width: 100%;
-            padding: 10px 10px 10px 36px;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            background-color: var(--slate-50);
-            box-sizing: border-box;
-            transition: all 0.2s;
-        }
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+        .filter-btn { padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: var(--bg-base); color: var(--text-main); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .filter-btn:hover { border-color: var(--primary-light); }
+        .filter-btn.active { background-color: rgba(139, 92, 246, 0.15); color: var(--primary); border-color: var(--primary); }
 
-        .search-input:focus {
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-            outline: none;
-            border-color: var(--primary);
-            background-color: white;
-        }
+        .routing-preview { background: var(--bg-base); border: 1px dashed var(--border-color); border-radius: var(--radius-sm); padding: 16px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
 
-        /* Categories Grid */
-        .filter-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
+        .tips-feed { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 12px; padding-right: 4px; }
+        .tip-card { background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; }
+        .tip-meta { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; color: var(--primary); margin-bottom: 4px; }
+        .tip-card p { margin: 0; font-size: 0.8rem; color: var(--text-main); line-height: 1.4; }
+        .tip-form input, .tip-form textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-base); color: var(--text-main); font-size: 0.8rem; margin-bottom: 6px; box-sizing: border-box; }
+        .tip-form button { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .tip-form button:hover { background: var(--primary-dark); }
 
-        .filter-btn {
-            padding: 10px 12px;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-            background-color: white;
-            color: var(--slate-700);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* --- Map Controls & Floating UI --- */
+        .map-wrapper { position: relative; width: 100%; height: 100%; background: var(--bg-base); }
+        #map { width: 100%; height: 100%; z-index: 1; }
+        
+        .map-floating-badge { position: absolute; top: 20px; left: 20px; background: var(--bg-panel); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px; z-index: 1001; box-shadow: var(--shadow-md); transition: 0.3s; }
+        
+        .map-top-right { position: absolute; top: 20px; right: 20px; z-index: 1001; display: flex; flex-direction: column; gap: 10px; }
+        .control-btn { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; box-shadow: var(--shadow-md); transition: all 0.2s ease; background-color: var(--bg-panel); color: var(--text-main); }
+        .control-btn:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--primary); }
+        #errorBanner { display: none; position: absolute; top: 0; left: 0; width: 100%; background-color: #f59e0b; color: white; text-align: center; padding: 12px; font-weight: bold; z-index: 9999; }
 
-        .filter-btn:hover {
-            background-color: var(--slate-50);
-            border-color: var(--slate-700);
-        }
+        /* --- CLAUDE'S LEGEND (Adapts to Light/Dark) --- */
+        .map-legend { position: absolute; bottom: 24px; left: 20px; background: var(--bg-panel); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-main); z-index: 1001; min-width: 180px; box-shadow: var(--shadow-md); transition: 0.3s; }
+        .legend-title { font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: block; }
+        .legend-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .legend-item { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--bg-panel); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
 
-        .filter-btn.active {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
+        /* --- LEAFLET UI OVERRIDES --- */
+        .leaflet-div-icon { background: transparent; border: none; }
+        .leaflet-popup-content-wrapper { background: var(--bg-panel); color: var(--text-main); border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-md); transition: 0.3s; }
+        .leaflet-popup-tip { background: var(--bg-panel); transition: 0.3s; }
+        .leaflet-container a.leaflet-popup-close-button { color: var(--text-muted); top: 8px; right: 8px; }
 
-        /* Quick Transit Routing Area */
-        .routing-preview {
-            background: var(--slate-50);
-            border: 1px dashed var(--slate-200);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            font-size: 0.85rem;
-            color: var(--slate-700);
-            line-height: 1.5;
-        }
-
-        /* Community Tips UI */
-        .tips-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            padding-right: 4px;
-        }
-
-        .tip-card {
-            background: var(--slate-50);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-        }
-
-        .tip-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .tip-card p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: var(--slate-700);
-            line-height: 1.4;
-        }
-
-        .tip-form input, .tip-form textarea {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            margin-bottom: 6px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .tip-form button {
-            width: 100%;
-            background: var(--slate-900);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .tip-form button:hover {
-            background: var(--primary);
-        }
-
-        /* --- Map Viewport Wrapper --- */
-        .map-wrapper {
-            position: relative;
-            background-color: #cbd5e1;
-            width: 100%;
-            height: 100%;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .map-floating-badge {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--slate-900);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 1001;
-        }
-
-        @media (max-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 400px;
-            }
-            .sidebar { border-right: none; }
-        }
+        @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; grid-template-rows: 1fr 400px; } .sidebar { border-right: none; } }
     </style>
 </head>
-<body>
+<body class="dark-theme">
 
     <header>
         <div class="logo-area">
-            <h1><i class="fa-solid fa-train-subway" style="color: #3b82f6;"></i> TransitMall Mapper</h1>
+            <h1><i class="fa-solid fa-train-subway" style="color: var(--primary);"></i> TransitMall Mapper</h1>
             <p>Klang Valley Transit Student Directory</p>
         </div>
-        <a href="admin.html" class="admin-link"><i class="fa-solid fa-sliders"></i> Admin Dashboard</a>
+        <a href="login.html" class="admin-link"><i class="fa-solid fa-sliders"></i> Admin Dashboard</a>
     </header>
 
     <main class="app-container">
-        
+        <!-- SIDEBAR WITH PILLS & ORIGINAL SECTIONS -->
         <aside class="sidebar">
-            
+
+            <!-- ROUTE PLANNER: START + DESTINATION -->
             <div class="sidebar-section">
-                <h2><i class="fa-solid fa-magnifying-glass"></i> Find Your Destination</h2>
-                
-                <button id="locateBtn" class="filter-btn" style="width: 100%; margin-bottom: 12px; background: var(--slate-900); color: white; justify-content: center;">
-                    📍 Find Nearest Mall To Me
+                <h2><i class="fa-solid fa-route"></i> Plan Your Trip</h2>
+
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px;">Starting From</div>
+                <div class="route-search-wrapper" id="originWrapper">
+                    <div class="search-wrapper" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-crosshairs"></i>
+                        <input type="text" class="search-input" id="originSearch" placeholder="Station, place, or address..." autocomplete="off">
+                    </div>
+                    <div class="suggestions-dropdown" id="originSuggestions"></div>
+                </div>
+                <div class="route-badge origin-badge" id="originBadge">
+                    <span id="originBadgeText"></span>
+                    <button id="originClearBtn" title="Clear starting point"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="firstmile-toggle" id="firstMileToggle">
+                    <div class="firstmile-toggle-row">
+                        <button type="button" class="firstmile-toggle-btn" id="fmWalkBtn" data-mode="walk">
+                            <i class="fa-solid fa-person-walking"></i>
+                            <span>Walk</span>
+                            <span class="fm-time" id="fmWalkTime">--</span>
+                        </button>
+                        <button type="button" class="firstmile-toggle-btn" id="fmDriveBtn" data-mode="drive">
+                            <i class="fa-solid fa-car"></i>
+                            <span>Drive / Grab</span>
+                            <span class="fm-time" id="fmDriveTime">--</span>
+                        </button>
+                    </div>
+                    <div class="firstmile-note" id="firstMileNote"></div>
+                </div>
+                <button class="filter-btn use-location-btn" id="useMyLocationBtn">
+                    <i class="fa-solid fa-location-crosshairs"></i> Use My Current Location
                 </button>
 
-                <div class="search-wrapper">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" class="search-input" id="mallSearch" placeholder="Search malls, stations, or lines...">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 18px 0 6px 0;">Going To</div>
+                <div class="route-search-wrapper" id="destWrapper">
+                    <div class="search-wrapper" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                        <input type="text" class="search-input" id="destSearch" placeholder="Search malls, stations, or lines..." autocomplete="off">
+                    </div>
+                    <div class="suggestions-dropdown" id="destSuggestions"></div>
                 </div>
-                <div class="filter-grid">
+                <div class="route-badge dest-badge" id="destBadge">
+                    <span id="destBadgeText"></span>
+                    <button id="destClearBtn" title="Clear destination"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2><i class="fa-solid fa-filter"></i> Filter Malls</h2>
+
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">Filter By Line</div>
+                <div class="pill-scroll-container" id="lineFilters">
+                    <button class="line-pill active" data-line="all">All Lines</button>
+                    <button class="line-pill" data-line="Kajang">KG</button>
+                    <button class="line-pill" data-line="Putrajaya">PY</button>
+                    <button class="line-pill" data-line="Kelana Jaya">KJ</button>
+                    <button class="line-pill" data-line="Ampang">AG</button>
+                    <button class="line-pill" data-line="Sri Petaling">SP</button>
+                    <button class="line-pill" data-line="Monorail">MR</button>
+                </div>
+
+                <div class="filter-grid" id="categoryFilters">
                     <button class="filter-btn active" data-category="all">📍 All Malls</button>
                     <button class="filter-btn" data-category="grocery">🛒 Groceries</button>
                     <button class="filter-btn" data-category="cinema">🎬 Cinemas</button>
@@ -336,255 +226,1435 @@
             </div>
 
             <div class="sidebar-section">
-                <h2><i class="fa-solid fa-route"></i> Quick Transit Route</h2>
+                <h2><i class="fa-solid fa-diagram-project"></i> Route & Travel Time</h2>
                 <div class="routing-preview" id="routePreview">
-                    <p style="margin:0; color: #64748b;"><i class="fa-solid fa-info-circle"></i> Click a mall marker on the map to see station exits, lines, and walking distances instantly.</p>
+                    <p style="margin:0;"><i class="fa-solid fa-info-circle"></i> Pick a starting station and a destination above (or click a mall marker on the map) to see the full journey, transfers, and estimated total time.</p>
                 </div>
             </div>
 
             <div class="sidebar-section" style="border-bottom: none; flex: 1;">
                 <h2><i class="fa-solid fa-comments"></i> Student Transit Tips</h2>
-                
                 <div class="tips-feed" id="tipsFeed">
                     <div class="tip-card">
-                        <div class="tip-meta">
-                            <span>📍 Sunway Velocity</span>
-                            <span>@CommuterElf</span>
-                        </div>
+                        <div class="tip-meta"><span>📍 Sunway Velocity</span><span>@CommuterElf</span></div>
                         <p>Take Maluri MRT Exit B! There's an underground walkway directly into the basement levels so you completely dodge the sun or rain.</p>
                     </div>
                 </div>
-
                 <form class="tip-form" id="uiTipForm">
                     <input type="text" id="uiTipLoc" placeholder="Mall or Station Name" required>
                     <textarea id="uiTipTxt" rows="2" placeholder="Drop a helpful tip or shortcut..." required></textarea>
                     <button type="submit">Post to Community</button>
                 </form>
             </div>
-
         </aside>
 
         <section class="map-wrapper">
+            <div id="errorBanner"></div>
             <div class="map-floating-badge">
                 <i class="fa-solid fa-circle" id="statusDot" style="color: #10b981; font-size: 0.6rem;"></i>
                 <span id="activeFilterBadge">Showing: All Malls</span>
             </div>
+
+            <div class="map-top-right">
+                <button class="control-btn" id="themeToggleBtn"><i class="fa-solid fa-sun"></i> Light Mode</button>
+                <button class="control-btn" id="locateBtn"><i class="fa-solid fa-location-crosshairs"></i> Locate Me</button>
+            </div>
+
+            <!-- COMPREHENSIVE LEGEND -->
+            <div class="map-legend">
+                <span class="legend-title">Lines & Markers</span>
+                <div class="legend-grid">
+                    <div class="legend-item"><div class="legend-color" style="background-color: #00785B;"></div><span>Kajang Line</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #FFD100;"></div><span>Putrajaya Line</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #E32551;"></div><span>Kelana Jaya Line</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #F58220;"></div><span>Ampang Line</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #7A283B;"></div><span>Sri Petaling Line</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #8CC63F;"></div><span>KL Monorail</span></div>
+                </div>
+                <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
+                <div class="legend-item">
+                    <div style="width:14px; height:14px; border-radius:50%; border:2px solid var(--border-color); display:flex; align-items:center; justify-content:center;">
+                        <div style="width:4px; height:4px; background:var(--text-muted); border-radius:50%;"></div>
+                    </div>
+                    <span>Interchange</span>
+                </div>
+                <div class="legend-item"><span style="font-size: 1.1rem; margin-right: 2px;">🏬</span><span>Shopping Mall</span></div>
+                <div class="legend-item"><span style="font-size: 1.1rem; margin-right: 2px; color:#10b981;"><i class="fa-solid fa-person"></i></span><span>Your Starting Point</span></div>
+            </div>
             
             <div id="map"></div>
         </section>
-
     </main>
 
     <script>
-        // --- 1. Global State & Local Port Configuration ---
         let mallDatabase = [];
-        // UPDATED LINK FOR RYAN'S LIVE TUNNEL:
         const backendUrl = "https://298t6s1c-5001.asse.devtunnels.ms/api/malls";
+        let activeRouteLayers = [];   // holds every polyline drawn for the current route
+        let activeCategory = 'all';
+        let currentLineFilter = 'all';
+        let originStation = null;    // name of the station the user picked as their starting point
+        let originMarker = null;
+        let currentDestination = null; // { type:'mall', label, sub, mall } or { type:'station', label, name }
 
-        // --- 2. Initialize Leaflet Map Object ---
-        const map = L.map('map').setView([3.1390, 101.6869], 11);
+        // Set whenever the origin is a free-text/geo place rather than an actual station picked
+        // from the list. Holds both walking and driving estimates for the "first mile" leg from
+        // that place to the nearest station, plus which mode the user currently has selected.
+        // null whenever the origin IS a real station (no first-mile leg needed).
+        let originFirstMile = null; // { meters, walkMins, driveMins, mode: 'walk'|'drive', stationName, label, lat, lng }
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Whenever the currently-selected mall turns out to be about as close (or closer) to the
+        // origin than the nearest station, we bypass the train entirely. These two track that state
+        // so the Walk/Drive toggle and route renderer know to talk about "the mall" instead of "the station".
+        let directRouteInfo = null;      // { meters, walkMins, driveMins } straight to the mall, when active
+        let firstMileTarget = 'station'; // 'station' (normal) or 'mall' (direct-route shortcut active)
+
+        // Rough time assumptions for KV rail (used only to produce an estimate, not live schedule data).
+        // IMPORTANT: this map only lists a curated subset of each line's real stations, so a "hop"
+        // between two listed stations can quietly span several real stations and many km. Timing must
+        // therefore be based on actual distance, not hop count, or long stretches come out absurdly fast.
+        // Calibrated per-line: each line has its OWN real km-per-station spacing (see LINE_SPACING_KM
+        // below), taken from that line's official length / official station count. A single blanket
+        // spacing constant for every line was the main source of wrong times — a dense LRT line and a
+        // sparse MRT line do not have the same gap between stations, so one constant under/over-counts
+        // implied stops depending on which line you're riding.
+        const RUNNING_SPEED_KMH = 60;      // train's actual moving speed between stops
+        const DWELL_SECONDS_PER_STOP = 40; // time stopped at each intermediate station
+        const TRANSFER_PENALTY = 5;        // minutes to walk/wait when switching lines at an interchange
+        // Real rail tracks curve; our station coordinates are straight-line map points, so straight-line
+        // distance between two stations always under-measures the actual track distance the train covers.
+        // This is a standard correction ("curviness"/detour factor) used by routing tools when working
+        // from straight-line coordinates instead of real track geometry. 1.25 reproduces official
+        // end-to-end line times closely when checked against the Kajang Line's published ~51km/~70min.
+        const TRACK_CURVE_FACTOR = 1.25;
+
+        // --- FIRST-MILE (origin place -> nearest station) walk/drive assumptions ---
+        const WALK_SPEED_MPM = 80;          // ~80 metres per minute walking pace
+        const DRIVING_SPEED_KMH = 25;       // average urban driving speed incl. traffic/lights (KV roads)
+        const DRIVE_ROAD_FACTOR = 1.4;      // straight-line -> real road-distance correction (roads aren't straight)
+        const DRIVE_OVERHEAD_MIN = 6;       // fixed overhead: unparking/parking, or waiting for a Grab to arrive
+        // Distance beyond which we default to suggesting "Drive" instead of "Walk" for the first mile
+        const FIRST_MILE_DRIVE_SUGGEST_METERS = 900;
+
+        // --- DIRECT-TO-MALL SHORTCUT ---
+        // If the mall itself is about as close to the origin as the nearest station is, taking the
+        // train makes no sense — you'd walk/drive past (or near) the mall just to catch a ride back.
+        // In that case we skip the whole rail route and just send the user straight to the mall.
+        const DIRECT_VS_STATION_SLACK = 1.2;      // mall can be up to 20% farther than the nearest station and we STILL go direct
+        const DIRECT_ROUTE_ABS_CAP_METERS = 3000; // never suggest a "direct" route beyond ~3km either way
+
+        // Real official figures: line length (km) / (official station count - 1) = average real gap.
+        // Source: MRT Corp / Rapid KL published line lengths and station counts.
+        //   Kajang:        51 km / 28 gaps  (29 stations)  => 1.82 km/gap
+        //   Putrajaya:     57.7 km / 36 gaps (37 stations, incl. annexed Kajang-shared stations) => 1.60 km/gap
+        //   Kelana Jaya:   46.4 km / 36 gaps (37 stations) => 1.29 km/gap
+        //   Ampang:        ~18 km / 17 gaps (18 stations)  => 1.06 km/gap
+        //   Sri Petaling:  ~29 km / 28 gaps (29 stations)  => 1.04 km/gap
+        //   Monorail:      8.6 km / 10 gaps (11 stations)  => 0.86 km/gap
+        const LINE_SPACING_KM = {
+            "MRT Kajang Line": 1.82,
+            "MRT Putrajaya Line": 1.60,
+            "LRT Kelana Jaya Line": 1.29,
+            "LRT Ampang Line": 1.06,
+            "LRT Sri Petaling Line": 1.04,
+            "KL Monorail": 0.86
+        };
+        const DEFAULT_SPACING_KM = 1.3; // fallback for any line not in the table above
+
+        // Minutes to ride a single segment (one line, possibly several hops), based on real distance.
+        // Our station list only covers a curated subset of each line's real stations, so one "hop" here
+        // may quietly pass through several real stations in between. We estimate how many using that
+        // LINE's own real station spacing, and add dwell time for each one the train actually stops at.
+        // Minutes to travel one hop (running time + dwell for any real stations implied along the way).
+        // Shared by the pathfinder (for weighting routes) and the display (for showing times).
+        function hopMinutes(aName, bName, lineName) {
+            const a = stationIndex[aName], b = stationIndex[bName];
+            const straightKm = map.distance([a.lat, a.lng], [b.lat, b.lng]) / 1000;
+            const km = straightKm * TRACK_CURVE_FACTOR; // corrected for real track curviness
+            const running = (km / RUNNING_SPEED_KMH) * 60;
+            const spacing = (lineName && LINE_SPACING_KM[lineName]) || DEFAULT_SPACING_KM;
+            const impliedGaps = Math.max(1, Math.round(km / spacing));
+            const stopsHere = Math.max(0, impliedGaps - 1); // extra real stations skipped between a and b
+            // Every hop stops at destination station b at minimum (+1), plus one more dwell for each
+            // skipped/implied station along the way. Without the "+1" here, a fully-detailed line (every
+            // real station present, stopsHere = 0 on almost every hop) would count ZERO dwell time at all
+            // and come out far too fast — this is what made full-line totals understate reality badly.
+            const dwell = ((stopsHere + 1) * DWELL_SECONDS_PER_STOP) / 60;
+            return { minutes: running + dwell, impliedStops: stopsHere };
+        }
+
+        function segmentRideBreakdown(seg) {
+            let runningMin = 0, dwellMin = 0, impliedStops = 0;
+            for (let i = 1; i < seg.stations.length; i++) {
+                const h = hopMinutes(seg.stations[i - 1], seg.stations[i], seg.line.name);
+                runningMin += h.minutes; // hopMinutes already folds running+dwell together
+                impliedStops += h.impliedStops;
+            }
+            return { minutes: runningMin, runningMin, dwellMin, impliedStops };
+        }
+
+        // Estimates walk AND drive time for a straight-line distance (metres) from an origin place
+        // to the station that will be used to board the rail network.
+        function estimateFirstMile(meters) {
+            const walkMins = Math.max(1, Math.round(meters / WALK_SPEED_MPM));
+            const roadKm = (meters / 1000) * DRIVE_ROAD_FACTOR;
+            const driveMins = Math.max(1, Math.round((roadKm / DRIVING_SPEED_KMH) * 60 + DRIVE_OVERHEAD_MIN));
+            return { walkMins, driveMins };
+        }
+
+        function clearRouteLayers() {
+            activeRouteLayers.forEach(layer => map.removeLayer(layer));
+            activeRouteLayers = [];
+        }
+
+        function defaultRoutePreviewHTML() {
+            return `<p style="margin:0;"><i class="fa-solid fa-info-circle"></i> Pick a starting station and a destination above (or click a mall marker on the map) to see the full journey, transfers, and estimated total time.</p>`;
+        }
+
+        // 1. MAP INIT & THEME TOGGLE
+        const map = L.map('map', { zoomControl: false }).setView([3.1390, 101.6869], 12);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        const lightTiles = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+        const darkTiles = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
+        let currentTileLayer = L.tileLayer(darkTiles, {
+            attribution: '© OpenStreetMap contributors © CARTO', maxZoom: 19
         }).addTo(map);
 
-        // NEW: Changed from layerGroup to markerClusterGroup!
-        let markerGroup = L.markerClusterGroup().addTo(map);
+        let isDarkMode = true;
+        document.getElementById('themeToggleBtn').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            map.removeLayer(currentTileLayer);
 
-        // --- 3. Render Markers to Map ---
-        function renderMapMarkers(mallsList) {
-            markerGroup.clearLayers();
-            if (mallsList.length === 0) return;
+            if (isDarkMode) {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggleBtn').innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+                currentTileLayer = L.tileLayer(darkTiles, { maxZoom: 19 }).addTo(map);
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.getElementById('themeToggleBtn').innerHTML = '<i class="fa-solid fa-moon"></i> Dark Mode';
+                currentTileLayer = L.tileLayer(lightTiles, { maxZoom: 19 }).addTo(map);
+            }
+        });
 
-            mallsList.forEach(mall => {
-                // Support both flat coordinate backup keys and live nested coordinate dictionary
-                const lat = mall.latitude || (mall.coordinates ? mall.coordinates.lat : null);
-                const lon = mall.longitude || (mall.coordinates ? mall.coordinates.lon : null);
+        let markerGroup = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true }).addTo(map);
 
-                if (lat && lon) {
-                    const marker = L.marker([lat, lon]);
-                    
-                    // Display Station, Line AND Google Maps Option explicitly in the popup bubble
-                    marker.bindPopup(`
-                        <div style="font-family: sans-serif; font-size: 0.85rem; line-height:1.4; min-width: 160px;">
-                            <strong style="color: var(--primary); font-size:0.95rem;">${mall.mall_name}</strong><br>
-                            <span style="color: #475569; display: inline-block; margin-top: 4px;">🚉 ${mall.station || 'Unknown Station'}</span><br>
-                            <span style="color: #64748b; font-size: 0.75rem;">🛤️ ${mall.line || 'Line Information Unavailable'}</span>
-                            
-                            <!-- NEW GOOGLE MAPS ROUTING BUTTON -->
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=transit" target="_blank" style="display: block; margin-top: 10px; background: #10b981; color: white; text-align: center; padding: 6px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem; transition: 0.2s;">
-                                <i class="fa-solid fa-map-location-dot"></i> Route Me Here
-                            </a>
-                        </div>
-                    `);
+        // 2. ICONS & TRANSIT NETWORK
+        function createStationIcon(hexColor, isInterchange) {
+            if (isInterchange) {
+                return L.divIcon({ className: '', html: `<div style="width:16px;height:16px; border-radius:50%; background:var(--bg-panel); border:3px solid ${hexColor}; box-shadow:0 0 10px ${hexColor}; display:flex; align-items:center; justify-content:center;"><div style="width:6px;height:6px;background:${hexColor};border-radius:50%;"></div></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+            }
+            return L.divIcon({ className: '', html: `<div style="width:12px;height:12px; border-radius:50%; background:${hexColor}; border:2px solid var(--bg-panel); box-shadow:0 0 6px ${hexColor};"></div>`, iconSize: [12, 12], iconAnchor: [6, 6] });
+        }
 
-                    // Inject structured 3-step route instructions directly into the sidebar panel
-                    marker.on('click', () => {
-                        const routePreview = document.getElementById('routePreview');
-                        routePreview.innerHTML = `
-                            <h3 style="margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; border-bottom: 1px solid var(--slate-200); padding-bottom: 6px;">
-                                🗺️ Last-Mile Guide: ${mall.mall_name}
-                            </h3>
-                            <div style="display: grid; grid-template-columns: 20px 1fr; gap: 8px; margin-bottom: 10px; line-height: 1.4;">
-                                <i class="fa-solid fa-train-tram" style="color: #64748b; margin-top: 3px; font-size: 0.85rem;"></i>
-                                <div><strong style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">1. Take Train Line</strong><br>${mall.line || 'N/A'}</div>
-                                
-                                <i class="fa-solid fa-location-dot" style="color: #ef4444; margin-top: 3px; font-size: 0.85rem;"></i>
-                                <div><strong style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">2. Alight At Station</strong><br>${mall.station || 'N/A'}</div>
-                                
-                                <i class="fa-solid fa-person-walking" style="color: #10b981; margin-top: 3px; font-size: 0.85rem;"></i>
-                                <div><strong style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">3. Exit Path</strong><br>${mall.best_exit || 'Main Exit'} (${mall.walking_time_mins || '5'} mins walk)</div>
-                            </div>
-                            
-                            <div style="font-size: 0.8rem; color: #475569; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid var(--slate-200);">
-                                <i class="fa-solid fa-lightbulb" style="color:#f59e0b;"></i> <strong>Tip:</strong> Follow the internal station signage toward your specified exit linkway.
-                            </div>
-                        `;
-                    });
+        const mallIconTemplate = L.divIcon({
+            className: '',
+            html: `<div style="background:var(--primary); color:white; border-radius:50% 50% 50% 0; transform:rotate(-45deg); width:32px; height:32px; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg-panel); box-shadow:0 2px 8px rgba(0,0,0,0.5); font-size:14px;"><span style="transform:rotate(45deg)">🏬</span></div>`,
+            iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -34]
+        });
 
-                    markerGroup.addLayer(marker);
+        const originIconTemplate = L.divIcon({
+            className: '',
+            html: `<div style="background:#10b981; color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border:3px solid var(--bg-panel); box-shadow:0 2px 10px rgba(16,185,129,0.7); font-size:13px;"><i class="fa-solid fa-person"></i></div>`,
+            iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -16]
+        });
+
+        const transitLines = [
+            {
+                name: "MRT Kajang Line", color: "#00785B",
+                // FULL official 29-station list (Kwasa Damansara -> Kajang), in real order, per MRT Corp.
+                // Coordinates are careful estimates along the real corridor (not survey-grade GPS), but
+                // every real station is now represented, so hop distances closely match reality and no
+                // "implied stop" guessing is needed for this line anymore.
+                stations: [
+                    { name: "Kwasa Damansara", lat: 3.1765, lng: 101.5724, int: true },
+                    { name: "Kwasa Sentral", lat: 3.1740, lng: 101.5860, int: false },
+                    { name: "Kota Damansara", lat: 3.1616, lng: 101.5934, int: false },
+                    { name: "Surian", lat: 3.1566, lng: 101.6013, int: false },
+                    { name: "Mutiara Damansara", lat: 3.1567, lng: 101.6106, int: false },
+                    { name: "Bandar Utama", lat: 3.1488, lng: 101.6158, int: true },
+                    { name: "Taman Tun Dr Ismail", lat: 3.1421, lng: 101.6255, int: false },
+                    { name: "Phileo Damansara", lat: 3.1372, lng: 101.6395, int: false },
+                    { name: "Pusat Bandar Damansara", lat: 3.1451, lng: 101.6613, int: false },
+                    { name: "Semantan", lat: 3.1454, lng: 101.6706, int: false },
+                    { name: "Muzium Negara (KL Sentral)", lat: 3.1374, lng: 101.6865, int: true },
+                    { name: "Pasar Seni", lat: 3.1427, lng: 101.6951, int: true },
+                    { name: "Merdeka", lat: 3.1417, lng: 101.7018, int: true },
+                    { name: "Bukit Bintang", lat: 3.1444, lng: 101.7118, int: true },
+                    { name: "TRX", lat: 3.1428, lng: 101.7188, int: true },
+                    { name: "Cochrane", lat: 3.1348, lng: 101.7233, int: false },
+                    { name: "Maluri", lat: 3.1251, lng: 101.7280, int: true },
+                    { name: "Taman Pertama", lat: 3.1147, lng: 101.7328, int: false },
+                    { name: "Taman Midah", lat: 3.1044, lng: 101.7378, int: false },
+                    { name: "Taman Mutiara", lat: 3.0959, lng: 101.7397, int: false },
+                    { name: "Taman Connaught", lat: 3.0842, lng: 101.7396, int: false },
+                    { name: "Taman Suntex", lat: 3.0745, lng: 101.7397, int: false },
+                    { name: "Sri Raya", lat: 3.0641, lng: 101.7473, int: false },
+                    { name: "Bandar Tun Hussein Onn", lat: 3.0453, lng: 101.7575, int: false },
+                    { name: "Batu 11 Cheras", lat: 3.0257, lng: 101.7654, int: false },
+                    { name: "Bukit Dukung", lat: 3.0089, lng: 101.7716, int: false },
+                    { name: "Sungai Jernih", lat: 2.9954, lng: 101.7784, int: false },
+                    { name: "Stadium Kajang", lat: 2.9888, lng: 101.7847, int: false },
+                    { name: "Kajang", lat: 2.9835, lng: 101.7904, int: false }
+                ]
+            },
+            {
+                name: "MRT Putrajaya Line", color: "#FFD100",
+                stations: [
+                    { name: "Kwasa Damansara", lat: 3.1765, lng: 101.5724, int: true },
+                    { name: "Kampung Selamat", lat: 3.1934, lng: 101.5752, int: false },
+                    { name: "Sungai Buloh", lat: 3.2036, lng: 101.5794, int: true },
+                    { name: "Damansara Damai", lat: 3.2010, lng: 101.5920, int: false },
+                    { name: "Sri Damansara Barat", lat: 3.1978, lng: 101.6083, int: false },
+                    { name: "Sri Damansara Sentral", lat: 3.1950, lng: 101.6180, int: false },
+                    { name: "Sri Damansara Timur", lat: 3.1980, lng: 101.6350, int: true },
+                    { name: "Metro Prima", lat: 3.2050, lng: 101.6420, int: false },
+                    { name: "Kepong Baru", lat: 3.2100, lng: 101.6480, int: false },
+                    { name: "Jinjang", lat: 3.2150, lng: 101.6560, int: false },
+                    { name: "Sri Delima", lat: 3.2050, lng: 101.6650, int: false },
+                    { name: "Kampung Batu", lat: 3.2020, lng: 101.6750, int: true },
+                    { name: "Kentonmen", lat: 3.1950, lng: 101.6800, int: false },
+                    { name: "Jalan Ipoh", lat: 3.1880, lng: 101.6870, int: false },
+                    { name: "Sentul Barat", lat: 3.1830, lng: 101.6900, int: false },
+                    { name: "Titiwangsa", lat: 3.1733, lng: 101.6953, int: true },
+                    { name: "Hospital Kuala Lumpur", lat: 3.1700, lng: 101.7020, int: false },
+                    { name: "Raja Uda", lat: 3.1650, lng: 101.7080, int: false },
+                    { name: "Ampang Park", lat: 3.1622, lng: 101.7180, int: true },
+                    { name: "Persiaran KLCC", lat: 3.1580, lng: 101.7150, int: false },
+                    { name: "Conlay", lat: 3.1500, lng: 101.7200, int: false },
+                    { name: "TRX", lat: 3.1428, lng: 101.7188, int: true },
+                    { name: "Chan Sow Lin", lat: 3.1276, lng: 101.7156, int: true },
+                    { name: "Sungai Besi", lat: 3.0581, lng: 101.7058, int: true },
+                    { name: "Putrajaya Sentral", lat: 2.9324, lng: 101.6692, int: false }
+                ]
+            },
+            {
+                name: "LRT Kelana Jaya Line", color: "#E32551",
+                stations: [
+                    { name: "Gombak", lat: 3.2312, lng: 101.7244, int: false },
+                    { name: "Taman Melati", lat: 3.2170, lng: 101.7290, int: false },
+                    { name: "Wangsa Maju", lat: 3.2030, lng: 101.7345, int: false },
+                    { name: "Sri Rampai", lat: 3.1930, lng: 101.7330, int: false },
+                    { name: "Setiawangsa", lat: 3.1800, lng: 101.7280, int: false },
+                    { name: "Jelatek", lat: 3.1690, lng: 101.7220, int: false },
+                    { name: "Dato Keramat", lat: 3.1650, lng: 101.7200, int: false },
+                    { name: "Ampang Park", lat: 3.1622, lng: 101.7180, int: true },
+                    { name: "KLCC", lat: 3.1590, lng: 101.7134, int: false },
+                    { name: "Kampung Baru", lat: 3.1610, lng: 101.7050, int: false },
+                    { name: "Dang Wangi", lat: 3.1568, lng: 101.7019, int: true },
+                    { name: "Masjid Jamek", lat: 3.1495, lng: 101.6964, int: true },
+                    { name: "Pasar Seni", lat: 3.1427, lng: 101.6951, int: true },
+                    { name: "KL Sentral", lat: 3.1343, lng: 101.6861, int: true },
+                    { name: "Bangsar", lat: 3.1280, lng: 101.6790, int: false },
+                    { name: "Abdullah Hukum", lat: 3.1230, lng: 101.6720, int: false },
+                    { name: "Kerinchi", lat: 3.1180, lng: 101.6650, int: false },
+                    { name: "Universiti", lat: 3.1130, lng: 101.6580, int: false },
+                    { name: "Taman Jaya", lat: 3.1080, lng: 101.6360, int: false },
+                    { name: "Asia Jaya", lat: 3.1040, lng: 101.6250, int: false },
+                    { name: "Taman Paramount", lat: 3.1030, lng: 101.6180, int: false },
+                    { name: "Taman Bahagia", lat: 3.1050, lng: 101.6100, int: false },
+                    { name: "Kelana Jaya", lat: 3.1126, lng: 101.5993, int: false },
+                    { name: "Lembah Subang", lat: 3.1030, lng: 101.5920, int: false },
+                    { name: "Ara Damansara", lat: 3.0930, lng: 101.5850, int: false },
+                    { name: "Glenmarie", lat: 3.0790, lng: 101.5800, int: false },
+                    { name: "Subang Jaya", lat: 3.0570, lng: 101.5860, int: false },
+                    { name: "SS15", lat: 3.0480, lng: 101.5870, int: false },
+                    { name: "SS18", lat: 3.0400, lng: 101.5860, int: false },
+                    { name: "USJ7", lat: 3.0330, lng: 101.5820, int: false },
+                    { name: "Taipan", lat: 3.0430, lng: 101.5920, int: false },
+                    { name: "Wawasan", lat: 3.0350, lng: 101.5960, int: false },
+                    { name: "USJ21", lat: 3.0230, lng: 101.5900, int: false },
+                    { name: "Alam Megah", lat: 3.0170, lng: 101.5840, int: false },
+                    { name: "Subang Alam", lat: 3.0100, lng: 101.5790, int: false },
+                    { name: "Putra Heights", lat: 2.9946, lng: 101.5741, int: true }
+                ]
+            },
+            {
+                name: "LRT Ampang Line", color: "#F58220",
+                stations: [
+                    { name: "Sentul Timur", lat: 3.1866, lng: 101.6953, int: false },
+                    { name: "Sentul", lat: 3.1800, lng: 101.6960, int: false },
+                    { name: "Titiwangsa", lat: 3.1733, lng: 101.6953, int: true },
+                    { name: "PWTC", lat: 3.1660, lng: 101.6950, int: false },
+                    { name: "Sultan Ismail", lat: 3.1590, lng: 101.6970, int: false },
+                    { name: "Bandaraya", lat: 3.1534, lng: 101.6946, int: true },
+                    { name: "Masjid Jamek", lat: 3.1495, lng: 101.6964, int: true },
+                    { name: "Plaza Rakyat", lat: 3.1444, lng: 101.7018, int: true },
+                    { name: "Hang Tuah", lat: 3.1397, lng: 101.7061, int: true },
+                    { name: "Pudu", lat: 3.1350, lng: 101.7110, int: false },
+                    { name: "Chan Sow Lin", lat: 3.1276, lng: 101.7156, int: true },
+                    { name: "Miharja", lat: 3.1260, lng: 101.7220, int: false },
+                    { name: "Maluri", lat: 3.1251, lng: 101.7280, int: true },
+                    { name: "Pandan Jaya", lat: 3.1230, lng: 101.7380, int: false },
+                    { name: "Pandan Indah", lat: 3.1240, lng: 101.7460, int: false },
+                    { name: "Cempaka", lat: 3.1300, lng: 101.7500, int: false },
+                    { name: "Cahaya", lat: 3.1400, lng: 101.7530, int: false },
+                    { name: "Ampang", lat: 3.1503, lng: 101.7600, int: false }
+                ]
+            },
+            {
+                name: "LRT Sri Petaling Line", color: "#7A283B",
+                stations: [
+                    { name: "Sentul Timur", lat: 3.1866, lng: 101.6953, int: false },
+                    { name: "Sentul", lat: 3.1800, lng: 101.6960, int: false },
+                    { name: "Titiwangsa", lat: 3.1733, lng: 101.6953, int: true },
+                    { name: "PWTC", lat: 3.1660, lng: 101.6950, int: false },
+                    { name: "Sultan Ismail", lat: 3.1590, lng: 101.6970, int: false },
+                    { name: "Bandaraya", lat: 3.1534, lng: 101.6946, int: true },
+                    { name: "Masjid Jamek", lat: 3.1495, lng: 101.6964, int: true },
+                    { name: "Plaza Rakyat", lat: 3.1444, lng: 101.7018, int: true },
+                    { name: "Hang Tuah", lat: 3.1397, lng: 101.7061, int: true },
+                    { name: "Pudu", lat: 3.1350, lng: 101.7110, int: false },
+                    { name: "Chan Sow Lin", lat: 3.1276, lng: 101.7156, int: true },
+                    { name: "Cheras", lat: 3.1180, lng: 101.7180, int: false },
+                    { name: "Salak Selatan", lat: 3.0980, lng: 101.7130, int: false },
+                    { name: "Bandar Tasik Selatan", lat: 3.0763, lng: 101.7118, int: true },
+                    { name: "Sungai Besi", lat: 3.0581, lng: 101.7058, int: true },
+                    { name: "Bukit Jalil", lat: 3.0583, lng: 101.6922, int: false },
+                    { name: "Sri Petaling", lat: 3.0615, lng: 101.6865, int: false },
+                    { name: "Awan Besar", lat: 3.0640, lng: 101.6780, int: false },
+                    { name: "Muhibbah", lat: 3.0600, lng: 101.6700, int: false },
+                    { name: "Alam Sutera", lat: 3.0480, lng: 101.6650, int: false },
+                    { name: "Kinrara BK5", lat: 3.0380, lng: 101.6600, int: false },
+                    { name: "IOI Puchong Jaya", lat: 3.0290, lng: 101.6180, int: false },
+                    { name: "Pusat Bandar Puchong", lat: 3.0230, lng: 101.6150, int: false },
+                    { name: "Taman Perindustrian Puchong", lat: 3.0170, lng: 101.6100, int: false },
+                    { name: "Bandar Puteri", lat: 3.0400, lng: 101.6050, int: false },
+                    { name: "Puchong Perdana", lat: 3.0200, lng: 101.5960, int: false },
+                    { name: "Puchong Prima", lat: 3.0130, lng: 101.5900, int: false },
+                    { name: "Putra Heights", lat: 2.9946, lng: 101.5741, int: true }
+                ]
+            },
+            {
+                name: "KL Monorail", color: "#8CC63F",
+                stations: [
+                    { name: "KL Sentral", lat: 3.1343, lng: 101.6861, int: true },
+                    { name: "Tun Sambanthan", lat: 3.1330, lng: 101.6920, int: false },
+                    { name: "Maharajalela", lat: 3.1390, lng: 101.6980, int: false },
+                    { name: "Hang Tuah", lat: 3.1397, lng: 101.7061, int: true },
+                    { name: "Imbi", lat: 3.1420, lng: 101.7100, int: false },
+                    { name: "Bukit Bintang", lat: 3.1444, lng: 101.7118, int: true },
+                    { name: "Raja Chulan", lat: 3.1500, lng: 101.7100, int: false },
+                    { name: "Bukit Nanas", lat: 3.1565, lng: 101.7049, int: true },
+                    { name: "Medan Tuanku", lat: 3.1593, lng: 101.6985, int: true },
+                    { name: "Chow Kit", lat: 3.1650, lng: 101.6980, int: false },
+                    { name: "Titiwangsa", lat: 3.1733, lng: 101.6953, int: true }
+                ]
+            }
+        ];
+
+        transitLines.forEach(line => {
+            const coords = line.stations.map(st => [st.lat, st.lng]);
+            L.polyline(coords, { color: line.color, weight: 4, opacity: 0.8 }).addTo(map);
+            
+            line.stations.forEach(st => {
+                L.marker([st.lat, st.lng], { icon: createStationIcon(line.color, st.int) })
+                 .addTo(map)
+                 .bindPopup(`<div style="padding:4px;"><strong style="font-size:14px; color:var(--text-main);">${st.name}</strong><br><span style="font-size:11px; color:var(--text-muted);">${line.name}</span>${st.int ? '<br><span style="font-size:10px; color:#10b981;">🔄 Interchange Station</span>' : ''}</div>`); 
+            });
+        });
+
+        // ====================================================
+        // 2b. STATION INDEX + ROUTE GRAPH (powers the trip planner)
+        // ====================================================
+        const stationIndex = {}; // name -> { lat, lng, lines:[{name,color}], int }
+        transitLines.forEach(line => {
+            line.stations.forEach(st => {
+                if (!stationIndex[st.name]) {
+                    stationIndex[st.name] = { lat: st.lat, lng: st.lng, lines: [], int: st.int };
                 }
+                stationIndex[st.name].lines.push({ name: line.name, color: line.color });
+            });
+        });
+        const allStationNames = Object.keys(stationIndex).sort();
+
+        const stationGraph = {}; // name -> [{ to, line:{name,color} }]
+        function addEdge(a, b, line) {
+            if (!stationGraph[a]) stationGraph[a] = [];
+            if (!stationGraph[b]) stationGraph[b] = [];
+            stationGraph[a].push({ to: b, line });
+            stationGraph[b].push({ to: a, line });
+        }
+        transitLines.forEach(line => {
+            for (let i = 1; i < line.stations.length; i++) {
+                addEdge(line.stations[i - 1].name, line.stations[i].name, { name: line.name, color: line.color });
+            }
+        });
+
+        // Finds a station key in stationIndex that loosely matches a mall's raw "station" field
+        function resolveStationName(rawName) {
+            if (!rawName) return null;
+            if (stationIndex[rawName]) return rawName;
+            // Case-insensitive + trimmed match, since backend data may not match the map's exact casing
+            const clean = rawName.trim().toLowerCase();
+            const found = allStationNames.find(key => {
+                const k = key.toLowerCase();
+                return clean.includes(k) || k.includes(clean);
+            });
+            return found || null;
+        }
+
+        // Legacy helper (kept for compatibility)
+        function findStationCoords(stationName) {
+            const key = resolveStationName(stationName);
+            return key ? [stationIndex[key].lat, stationIndex[key].lng] : null;
+        }
+
+        // BFS (fewest stops) across the whole rail network, tracking which line was ridden on each hop
+        // Finds the route that takes the LEAST TOTAL TIME (ride time + transfer penalties), not just the
+        // fewest stops. This matters because a "fewer hops" route that backtracks to a different line
+        // can easily be slower in real life than simply staying on the same line — plain BFS-by-hop-count
+        // can't tell the difference, so this uses Dijkstra over (station, arrival-line) states instead.
+        function findRoute(start, end) {
+            if (!stationGraph[start] || !stationGraph[end]) return null;
+            if (start === end) return [{ station: start, lineUsed: null }];
+
+            const startState = start + '\u0000__start__';
+            const bestCost = new Map([[startState, 0]]);
+            const cameFrom = new Map([[startState, { prevState: null, station: start, lineUsed: null, lineName: null }]]);
+            const frontier = [{ state: startState, station: start, lineName: null, cost: 0 }];
+            const settled = new Set();
+            let goalState = null;
+
+            while (frontier.length) {
+                frontier.sort((a, b) => a.cost - b.cost);
+                const current = frontier.shift();
+                if (settled.has(current.state)) continue;
+                settled.add(current.state);
+
+                if (current.station === end) { goalState = current.state; break; }
+
+                for (const edge of (stationGraph[current.station] || [])) {
+                    const rideCost = hopMinutes(current.station, edge.to, edge.line.name).minutes;
+                    const transferCost = (current.lineName && current.lineName !== edge.line.name) ? TRANSFER_PENALTY : 0;
+                    const newCost = current.cost + rideCost + transferCost;
+                    const nextState = edge.to + '\u0000' + edge.line.name;
+
+                    if (!bestCost.has(nextState) || newCost < bestCost.get(nextState)) {
+                        bestCost.set(nextState, newCost);
+                        cameFrom.set(nextState, { prevState: current.state, station: edge.to, lineUsed: edge.line, lineName: edge.line.name });
+                        frontier.push({ state: nextState, station: edge.to, lineName: edge.line.name, cost: newCost });
+                    }
+                }
+            }
+
+            if (!goalState) return null;
+
+            const path = [];
+            let state = goalState;
+            while (state) {
+                const info = cameFrom.get(state);
+                path.unshift({ station: info.station, lineUsed: info.lineUsed });
+                state = info.prevState;
+            }
+            return path;
+        }
+
+        // Groups a raw station-by-station path into ride segments (one per line), so transfers are explicit
+        function buildSegments(path) {
+            const segments = [];
+            for (let i = 1; i < path.length; i++) {
+                const step = path[i];
+                const currentSeg = segments[segments.length - 1];
+                if (currentSeg && currentSeg.line.name === step.lineUsed.name) {
+                    currentSeg.to = step.station;
+                    currentSeg.stations.push(step.station);
+                } else {
+                    segments.push({
+                        line: step.lineUsed,
+                        from: path[i - 1].station,
+                        to: step.station,
+                        stations: [path[i - 1].station, step.station]
+                    });
+                }
+            }
+            return segments;
+        }
+
+        // Renders the "first mile" step HTML (origin place -> boarding station), used when the
+        // origin is a free-text/geo place rather than a station picked directly from the list.
+        function firstMileStepHTML() {
+            if (!originFirstMile) return '';
+            const mode = originFirstMile.mode;
+            const icon = mode === 'drive' ? 'fa-car' : 'fa-person-walking';
+            const verb = mode === 'drive' ? 'Drive / Grab' : 'Walk';
+            const mins = mode === 'drive' ? originFirstMile.driveMins : originFirstMile.walkMins;
+            return `
+                <i class="fa-solid ${icon}" style="color:#f59e0b; margin-top:3px; font-size:0.85rem;"></i>
+                <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">0. ${verb} to Station</strong><br><span style="color:var(--text-main);">${originFirstMile.label} → ${originFirstMile.stationName}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">~${mins} min ${mode === 'drive' ? 'drive' : 'walk'} (${Math.round(originFirstMile.meters)}m, estimated)</span></div>
+            `;
+        }
+
+        function firstMileMinutes() {
+            if (!originFirstMile) return 0;
+            return originFirstMile.mode === 'drive' ? originFirstMile.driveMins : originFirstMile.walkMins;
+        }
+
+        function buildJourneyHTML(destLabel, mall, segments, rideMins, transferMins, walkMins, totalMins, fallbackMeters = null, totalStops = 0) {
+            let stepsHTML = firstMileStepHTML();
+            let stepNum = 1;
+            segments.forEach((seg, idx) => {
+                const icon = idx === 0 ? 'fa-train-tram' : 'fa-right-left';
+                const label = idx === 0 ? `Board at ${seg.from}` : `Transfer at ${seg.from}`;
+                const hopBreak = segmentRideBreakdown(seg);
+                const hopMins = Math.round(hopBreak.minutes);
+                const stopsNote = hopBreak.impliedStops > 0
+                    ? ` · ${hopBreak.impliedStops} stop${hopBreak.impliedStops > 1 ? 's' : ''} along the way`
+                    : '';
+                stepsHTML += `
+                    <i class="fa-solid ${icon}" style="color:${seg.line.color}; margin-top:3px; font-size:0.85rem;"></i>
+                    <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">${stepNum}. ${label}</strong><br><span style="color:var(--text-main);">${seg.line.name} → alight at ${seg.to}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">~${hopMins} min ride${stopsNote}</span></div>
+                `;
+                stepNum++;
+            });
+            if (mall) {
+                const walkLabel = fallbackMeters != null
+                    ? `No station listed — nearest stop is ~${Math.round(fallbackMeters)}m away`
+                    : (mall.best_exit || 'Main Exit');
+                const busNote = (fallbackMeters != null && fallbackMeters > 800)
+                    ? `<br><span style="font-size:0.65rem; color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Long stretch — a feeder bus or e-hailing may beat walking it.</span>`
+                    : '';
+                stepsHTML += `
+                    <i class="fa-solid fa-person-walking" style="color:#10b981; margin-top:3px; font-size:0.85rem;"></i>
+                    <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">${stepNum}. Walk to Mall</strong><br><span style="color:var(--text-main);">${walkLabel}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">~${walkMins} min walk${fallbackMeters != null ? ' (estimated)' : ''}</span>${busNote}</div>
+                `;
+            }
+
+            const transferCount = segments.length - 1;
+            const firstMileMins = originFirstMile ? firstMileMinutes() : 0;
+            const firstMileLabel = originFirstMile ? (originFirstMile.mode === 'drive' ? ' + ' + firstMileMins + ' min drive to station' : ' + ' + firstMileMins + ' min walk to station') : '';
+
+            return `
+                <h3 style="margin:0 0 10px 0; color:var(--text-main); font-size:1rem; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+                    Journey to ${destLabel}
+                </h3>
+                <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:8px; padding:10px 12px; margin-bottom:12px;">
+                    <span style="font-size:0.8rem; color:var(--text-main);"><i class="fa-solid fa-stopwatch"></i> Total journey time</span>
+                    <span style="font-size:1.15rem; font-weight:800; color:#10b981;">~${totalMins} min</span>
+                </div>
+                <div style="display:grid; grid-template-columns:20px 1fr; gap:8px; margin-bottom:10px; line-height:1.4;">
+                    ${stepsHTML}
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:8px;">
+                    ${firstMileMins > 0 ? `${firstMileMins} min ${originFirstMile.mode} to station + ` : ''}${rideMins} min ride${totalStops > 0 ? ` (~${totalStops} station stop${totalStops > 1 ? 's' : ''})` : ''}${transferCount > 0 ? ` + ${transferMins} min transfer${transferCount > 1 ? 's' : ''}` : ''}${mall ? ` + ${walkMins} min walk` : ''}. Estimate only — actual time varies with train frequency, traffic, and interchange distance.
+                </div>
+            `;
+        }
+
+        // Shown when the direct-route shortcut is active: the mall is close enough that taking
+        // the train would be pointless, so we just send the user straight there.
+        function directRouteHTML(destLabel, mode, mins, meters) {
+            const icon = mode === 'drive' ? 'fa-car' : 'fa-person-walking';
+            const verb = mode === 'drive' ? 'Drive / Grab' : 'Walk';
+            return `
+                <h3 style="margin:0 0 10px 0; color:var(--text-main); font-size:1rem; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+                    Journey to ${destLabel}
+                </h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 10px 0;">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Good news — <strong>${destLabel}</strong> is only about ${Math.round(meters)}m away, roughly as close as the nearest MRT/LRT station. No point taking the train for this one.
+                </p>
+                <div style="display:grid; grid-template-columns:20px 1fr; gap:8px; margin-bottom:10px; line-height:1.4;">
+                    <i class="fa-solid ${icon}" style="color:#10b981; margin-top:3px; font-size:0.85rem;"></i>
+                    <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">${verb} straight there</strong><br><span style="color:var(--text-main);">Direct to ${destLabel}</span></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:8px; padding:10px 12px; margin-bottom:10px;">
+                    <span style="font-size:0.8rem; color:var(--text-main);"><i class="fa-solid fa-stopwatch"></i> Total journey time</span>
+                    <span style="font-size:1.15rem; font-weight:800; color:#10b981;">~${mins} min</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:8px;">
+                    <i class="fa-solid fa-lightbulb"></i> Use the Walk / Drive toggle above to compare options. Estimate only — actual time may vary with traffic or route.
+                </div>
+            `;
+        }
+
+        function simpleFallbackHTML(mall) {
+            return `
+                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                    Last-Mile Guide: ${mall.mall_name}
+                </h3>
+                <div style="display: grid; grid-template-columns: 20px 1fr; gap: 8px; margin-bottom: 10px; line-height: 1.4;">
+                    <i class="fa-solid fa-train-tram" style="color: var(--text-muted); margin-top: 3px; font-size: 0.85rem;"></i>
+                    <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">1. Take Train Line</strong><br><span style="color:var(--text-main);">${mall.line || 'N/A'}</span></div>
+                    <i class="fa-solid fa-location-dot" style="color: #ef4444; margin-top: 3px; font-size: 0.85rem;"></i>
+                    <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">2. Alight At Station</strong><br><span style="color:var(--text-main);">${mall.station || 'N/A'}</span></div>
+                    <i class="fa-solid fa-person-walking" style="color: #10b981; margin-top: 3px; font-size: 0.85rem;"></i>
+                    <div><strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">3. Exit Path</strong><br><span style="color:var(--text-main);">${mall.best_exit || 'Main Exit'} (${mall.walking_time_mins || '5'} mins walk)</span></div>
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px;">
+                    <i class="fa-solid fa-lightbulb"></i> Tip: set a starting point above to see the full ride, transfers, and total travel time.
+                </div>
+            `;
+        }
+
+        // ====================================================
+        // 2c. CORE: compute + render a route to whatever destination is selected
+        // (destSelection = { type:'mall', label, sub, mall } or { type:'station', label, name })
+        // ====================================================
+        // Finds the closest station on the network to any lat/lng (straight-line distance).
+        // Used to bridge malls whose "station" field doesn't match anything in the network data.
+        function findNearestStation(lat, lng) {
+            const latlng = L.latLng(lat, lng);
+            let closest = null, shortest = Infinity;
+            allStationNames.forEach(name => {
+                const info = stationIndex[name];
+                const dist = map.distance(latlng, [info.lat, info.lng]);
+                if (dist < shortest) { shortest = dist; closest = name; }
+            });
+            return { name: closest, dist: shortest };
+        }
+
+        // Shown when there's no starting point yet AND the mall has no matching station —
+        // all we can honestly offer is "here's the nearest station and an estimated walk".
+        function fallbackOnlyHTML(mall, stationName, meters) {
+            const mins = Math.max(1, Math.round(meters / 80));
+            return `
+                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                    Last-Mile Guide: ${mall.mall_name}
+                </h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 10px 0;">
+                    <i class="fa-solid fa-circle-info"></i> No station is directly listed for this mall. The nearest station on the network is <strong>${stationName}</strong>, about ${Math.round(meters)}m (~${mins} min walk, straight-line estimate) away.
+                </p>
+                ${meters > 800 ? `<p style="font-size:0.75rem; color:#f59e0b; margin:0 0 10px 0;"><i class="fa-solid fa-triangle-exclamation"></i> That's a fair distance — a feeder bus, e-hailing, or short cab ride may beat walking it.</p>` : ''}
+                <div style="font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px;">
+                    <i class="fa-solid fa-lightbulb"></i> Set a starting point above to see the full ride, transfers, and total travel time from there.
+                </div>
+            `;
+        }
+
+        function showRouteToDestination(destSelection) {
+            clearRouteLayers();
+            if (!destSelection) return;
+
+            let destStationName, mall = null, destLat, destLon, destLabel;
+            let usedFallbackStation = false, fallbackWalkMeters = 0;
+
+            if (destSelection.type === 'mall') {
+                mall = destSelection.mall;
+                destLat = mall.latitude || (mall.coordinates ? mall.coordinates.lat : null);
+                destLon = mall.longitude || (mall.coordinates ? mall.coordinates.lon : null);
+                destLabel = mall.mall_name;
+                destStationName = resolveStationName(mall.station);
+
+                // Mall's listed station doesn't match anything in the network — fall back to the
+                // nearest station by straight-line distance so every mall with coordinates still routes.
+                if (!destStationName && destLat != null && destLon != null) {
+                    const nearest = findNearestStation(destLat, destLon);
+                    if (nearest.name) {
+                        destStationName = nearest.name;
+                        usedFallbackStation = true;
+                        fallbackWalkMeters = nearest.dist;
+                    }
+                }
+            } else {
+                destStationName = destSelection.name;
+                destLat = stationIndex[destStationName] ? stationIndex[destStationName].lat : null;
+                destLon = stationIndex[destStationName] ? stationIndex[destStationName].lng : null;
+                destLabel = destSelection.name;
+            }
+
+            if (destLat == null || destLon == null) {
+                document.getElementById('routePreview').innerHTML = `<p style="margin:0; color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> <strong>${destLabel}</strong> is missing map coordinates in the mall database, so a route can't be drawn for it yet.</p>`;
+                return;
+            }
+
+            // --- DIRECT-TO-MALL SHORTCUT CHECK ---
+            // Only relevant when the origin is a free-text/geo place (originFirstMile set) heading to
+            // a mall. If the mall itself sits about as close (or closer) to the origin as the nearest
+            // station does, there's no benefit to catching a train — just send the user straight there.
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            if (mall && originFirstMile) {
+                const directMeters = map.distance([originFirstMile.lat, originFirstMile.lng], [destLat, destLon]);
+                if (directMeters <= DIRECT_ROUTE_ABS_CAP_METERS && directMeters <= originFirstMile.meters * DIRECT_VS_STATION_SLACK) {
+                    const est = estimateFirstMile(directMeters);
+                    directRouteInfo = { meters: directMeters, walkMins: est.walkMins, driveMins: est.driveMins };
+                    firstMileTarget = 'mall';
+                }
+            }
+            renderFirstMileToggle();
+
+            if (firstMileTarget === 'mall') {
+                map.flyTo([destLat, destLon], 15, { duration: 1.2 });
+                const mode = originFirstMile.mode;
+                const mins = mode === 'drive' ? directRouteInfo.driveMins : directRouteInfo.walkMins;
+                const color = mode === 'drive' ? '#f59e0b' : '#10b981';
+                const directLine = L.polyline(
+                    [[originFirstMile.lat, originFirstMile.lng], [destLat, destLon]],
+                    { color, weight: 5, dashArray: '2, 8' }
+                ).addTo(map);
+                activeRouteLayers.push(directLine);
+                document.getElementById('routePreview').innerHTML = directRouteHTML(destLabel, mode, mins, directRouteInfo.meters);
+                return;
+            }
+
+            map.flyTo([destLat, destLon], 15, { duration: 1.2 });
+
+            // No starting point set yet
+            if (!originStation) {
+                if (destStationName) {
+                    const walkLine = L.polyline(
+                        [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
+                        { color: '#6366f1', weight: 4, dashArray: '5, 8' }
+                    ).addTo(map);
+                    activeRouteLayers.push(walkLine);
+                }
+                document.getElementById('routePreview').innerHTML = mall
+                    ? (usedFallbackStation ? fallbackOnlyHTML(mall, destStationName, fallbackWalkMeters) : simpleFallbackHTML(mall))
+                    : `<p style="margin:0;"><i class="fa-solid fa-info-circle"></i> Set a starting point above to see the route and travel time to <strong>${destLabel}</strong>.</p>`;
+                return;
+            }
+
+            if (!destStationName || !stationIndex[destStationName]) {
+                const rawStation = mall ? (mall.station || 'no station listed') : destLabel;
+                document.getElementById('routePreview').innerHTML = `<p style="margin:0; color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> <strong>${destLabel}</strong> is linked to station "<strong>${rawStation}</strong>", which isn't one of the ${allStationNames.length} stations currently in the map's network data. It may be served by a station outside the current MRT/LRT/Monorail list (e.g. KTM Komuter, BRT), or there's a naming mismatch in the mall's "station" field.</p>`;
+                return;
+            }
+
+            // Already there (only possible when origin IS the exact station, i.e. no first-mile leg)
+            if (originStation === destStationName && !originFirstMile) {
+                if (mall) {
+                    const walkLine = L.polyline(
+                        [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
+                        { color: '#6366f1', weight: 4, dashArray: '5, 8' }
+                    ).addTo(map);
+                    activeRouteLayers.push(walkLine);
+                    const walkMins = usedFallbackStation ? Math.max(1, Math.round(fallbackWalkMeters / 80)) : (mall.walking_time_mins || 5);
+                    const fallbackNote = usedFallbackStation
+                        ? `<p style="font-size:0.7rem; color:#f59e0b; margin:0 0 10px 0;"><i class="fa-solid fa-triangle-exclamation"></i> No station listed for this mall — walk time is a straight-line estimate from ${originStation}.</p>`
+                        : '';
+                    document.getElementById('routePreview').innerHTML = `
+                        <h3 style="margin:0 0 10px 0; color:var(--text-main); font-size:1rem;">You're already at ${originStation}! 🎉</h3>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 10px 0;">Just walk to <strong>${mall.mall_name}</strong>${usedFallbackStation ? '' : ` via ${mall.best_exit || 'the main exit'}`}.</p>
+                        ${fallbackNote}
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:8px; padding:10px 12px;">
+                            <span style="font-size:0.8rem; color:var(--text-main);"><i class="fa-solid fa-stopwatch"></i> Total journey time</span>
+                            <span style="font-size:1.15rem; font-weight:800; color:#10b981;">~${walkMins} min</span>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('routePreview').innerHTML = `<p style="margin:0;">You're already at <strong>${originStation}</strong>.</p>`;
+                }
+                return;
+            }
+
+            // Special case: origin is a geo place whose nearest station IS the destination station.
+            // No rail ride needed at all — just the first-mile leg (walk/drive) straight to the mall's station,
+            // then the last-mile walk into the mall.
+            if (originStation === destStationName && originFirstMile) {
+                const fmMins = firstMileMinutes();
+                let walkMins = 0;
+                if (mall) {
+                    const walkLine = L.polyline(
+                        [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
+                        { color: '#6366f1', weight: 4, dashArray: '5, 8' }
+                    ).addTo(map);
+                    activeRouteLayers.push(walkLine);
+                    walkMins = usedFallbackStation ? Math.max(1, Math.round(fallbackWalkMeters / 80)) : (mall.walking_time_mins || 5);
+                }
+                const totalMins = fmMins + walkMins;
+                document.getElementById('routePreview').innerHTML = buildJourneyHTML(destLabel, mall, [], 0, 0, walkMins, totalMins, usedFallbackStation ? fallbackWalkMeters : null, 0);
+                return;
+            }
+
+            // Real multi-stop / multi-line route
+            const path = findRoute(originStation, destStationName);
+            if (!path) {
+                document.getElementById('routePreview').innerHTML = `
+                    <p style="margin:0; color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> No direct rail route found between <strong>${originStation}</strong> and <strong>${destLabel}</strong>. A feeder bus or a transfer outside the rail network may be needed — check Google Maps transit for that last leg.</p>
+                `;
+                return;
+            }
+
+            const segments = buildSegments(path);
+            segments.forEach(seg => {
+                const coords = seg.stations.map(s => [stationIndex[s].lat, stationIndex[s].lng]);
+                const routeLine = L.polyline(coords, { color: seg.line.color, weight: 6, opacity: 0.95 }).addTo(map);
+                activeRouteLayers.push(routeLine);
+            });
+
+            // Draw the first-mile leg (origin place -> boarding station) when applicable
+            if (originFirstMile) {
+                const fmColor = originFirstMile.mode === 'drive' ? '#f59e0b' : '#10b981';
+                const fmLine = L.polyline(
+                    [[originFirstMile.lat, originFirstMile.lng], [stationIndex[originStation].lat, stationIndex[originStation].lng]],
+                    { color: fmColor, weight: 4, dashArray: '2, 8' }
+                ).addTo(map);
+                activeRouteLayers.push(fmLine);
+            }
+
+            let walkMins = 0;
+            if (mall) {
+                const walkLine = L.polyline(
+                    [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
+                    { color: '#6366f1', weight: 4, dashArray: '5, 8' }
+                ).addTo(map);
+                activeRouteLayers.push(walkLine);
+                walkMins = usedFallbackStation ? Math.max(1, Math.round(fallbackWalkMeters / 80)) : (mall.walking_time_mins || 5);
+            }
+
+            let rideMinsRaw = 0, totalImpliedStops = 0;
+            segments.forEach(seg => {
+                const b = segmentRideBreakdown(seg);
+                rideMinsRaw += b.minutes;
+                totalImpliedStops += b.impliedStops;
+            });
+            const rideMins = Math.round(rideMinsRaw);
+            const transferMins = (segments.length - 1) * TRANSFER_PENALTY;
+            const fmMins = firstMileMinutes();
+            const totalMins = fmMins + rideMins + transferMins + walkMins;
+
+            document.getElementById('routePreview').innerHTML = buildJourneyHTML(destLabel, mall, segments, rideMins, transferMins, walkMins, totalMins, usedFallbackStation ? fallbackWalkMeters : null, totalImpliedStops);
+        }
+
+        // Called from the "Route Me Here" button inside a mall's map popup.
+        // Routes the trip in-site (reusing the exact same engine as the sidebar search)
+        // instead of sending the user out to Google Maps.
+        function routeFromPopup(encodedName) {
+            const mallName = decodeURIComponent(encodedName);
+            const mall = mallDatabase.find(m => m.mall_name === mallName);
+            if (!mall) return;
+
+            map.closePopup();
+            setDestination({ type: 'mall', label: mall.mall_name, sub: mall.station || 'Mall', mall });
+
+            const preview = document.getElementById('routePreview');
+            if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // ====================================================
+        // 2d. STARTING POINT UI (search / autocomplete / GPS)
+        // ====================================================
+        function setOriginStation(name) {
+            if (!stationIndex[name]) return;
+            originStation = name;
+            originFirstMile = null; // picked a real station directly -> no first-mile leg
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            document.getElementById('firstMileToggle').style.display = 'none';
+            const info = stationIndex[name];
+            const lineNames = [...new Set(info.lines.map(l => l.name))].join(' / ');
+
+            document.getElementById('originBadge').style.display = 'flex';
+            document.getElementById('originBadgeText').innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> From <strong>${name}</strong> <span style="color:var(--text-muted);">(${lineNames})</span>`;
+
+            if (originMarker) map.removeLayer(originMarker);
+            originMarker = L.marker([info.lat, info.lng], { icon: originIconTemplate, zIndexOffset: 1000 })
+                .addTo(map)
+                .bindPopup(`<strong>Your Starting Point</strong><br>${name}`);
+
+            if (currentDestination) {
+                showRouteToDestination(currentDestination); // recompute now that origin changed
+            } else {
+                map.flyTo([info.lat, info.lng], 14, { duration: 1 });
+                clearRouteLayers();
+            }
+        }
+
+        let originGeoTimeout = null;
+
+        async function renderOriginSuggestions(term) {
+            const box = document.getElementById('originSuggestions');
+            if (!term || term.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+            // --- 1. Local station matches (instant) ---
+            const lower = term.toLowerCase();
+            const stationMatches = allStationNames
+                .filter(n => n.toLowerCase().includes(lower))
+                .slice(0, 4)
+                .map(name => {
+                    const info = stationIndex[name];
+                    const lineNames = [...new Set(info.lines.map(l => l.name))].join(' / ');
+                    const typeLabel = info.int ? 'Interchange' : info.lines[0].name.split(' ')[0];
+                    return `<div class="suggestion-item origin-suggestion-item" data-type="station" data-name="${name}" data-lat="${info.lat}" data-lng="${info.lng}">
+                        <i class="fa-solid fa-train-subway" style="color:${info.lines[0].color}; width:16px; flex-shrink:0;"></i>
+                        <div>
+                            <div style="font-weight:600;">${name}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted);">${typeLabel} &middot; ${lineNames}</div>
+                        </div>
+                    </div>`;
+                });
+
+            box.innerHTML = stationMatches.length
+                ? `<div class="suggestion-group-label">&#128649; Transit Stations</div>` + stationMatches.join('')
+                : '';
+
+            // Placeholder while the location search runs
+            box.innerHTML += `<div id="geoResults"><div class="suggestion-item" style="color:var(--text-muted); font-size:0.8rem; gap:8px;">
+                <i class="fa-solid fa-spinner fa-spin" style="width:16px;"></i> Searching locations...
+            </div></div>`;
+            box.style.display = 'block';
+            attachOriginClickHandlers(box);
+
+            // --- 2. Free-text location search via Nominatim (OpenStreetMap, no API key) ---
+            clearTimeout(originGeoTimeout);
+            originGeoTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(term)}&format=json&limit=4&countrycodes=my&accept-language=en&viewbox=101.3,3.4,101.9,2.8&bounded=0`
+                    );
+                    const data = await res.json();
+
+                    const geoDiv = document.getElementById('geoResults');
+                    if (!geoDiv) return;
+
+                    if (!data || data.length === 0) {
+                        geoDiv.innerHTML = `<div class="suggestion-item" style="color:var(--text-muted); font-size:0.8rem;">
+                            <i class="fa-solid fa-location-dot" style="width:16px;"></i> No nearby locations found
+                        </div>`;
+                        return;
+                    }
+
+                    const geoItems = data.map(place => {
+                        const icon = getGeoIcon(place.type, place.class);
+                        const shortType = formatPlaceType(place.type, place.class);
+                        const parts = place.display_name.split(',');
+                        const shortName = parts.slice(0, 2).join(',');
+                        const area = parts.slice(2, 4).join(',').trim();
+                        return `<div class="suggestion-item origin-suggestion-item"
+                            data-type="geo"
+                            data-name="${escapeAttr(shortName)}"
+                            data-lat="${place.lat}"
+                            data-lng="${place.lon}">
+                            <i class="${icon}" style="width:16px; flex-shrink:0; color:#f59e0b;"></i>
+                            <div>
+                                <div style="font-weight:600;">${shortName}</div>
+                                <div style="font-size:0.7rem; color:var(--text-muted);">${shortType} &middot; ${area}</div>
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                    geoDiv.innerHTML = `<div class="suggestion-group-label">&#128205; Locations</div>` + geoItems;
+                    attachOriginClickHandlers(box);
+
+                } catch (err) {
+                    const geoDiv = document.getElementById('geoResults');
+                    if (geoDiv) geoDiv.innerHTML = `<div class="suggestion-item" style="color:var(--text-muted); font-size:0.8rem;">
+                        <i class="fa-solid fa-triangle-exclamation" style="width:16px;"></i> Location search unavailable
+                    </div>`;
+                }
+            }, 500); // debounce so we don't spam the geocoder on every keystroke
+        }
+
+        function escapeAttr(str) {
+            return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function getGeoIcon(type, cls) {
+            if (cls === 'railway' || type === 'station') return 'fa-solid fa-train';
+            if (type === 'bus_stop' || type === 'bus_station') return 'fa-solid fa-bus';
+            if (cls === 'highway' || cls === 'road') return 'fa-solid fa-road';
+            if (type === 'university' || type === 'college') return 'fa-solid fa-graduation-cap';
+            if (type === 'school') return 'fa-solid fa-school';
+            if (type === 'hospital') return 'fa-solid fa-hospital';
+            if (cls === 'shop' || type === 'mall') return 'fa-solid fa-bag-shopping';
+            if (cls === 'place') return 'fa-solid fa-map-pin';
+            if (cls === 'building') return 'fa-solid fa-building';
+            return 'fa-solid fa-location-dot';
+        }
+
+        function formatPlaceType(type, cls) {
+            const map = {
+                station: 'Station', bus_stop: 'Bus Stop', bus_station: 'Bus Station',
+                university: 'University', college: 'College', school: 'School',
+                hospital: 'Hospital', mall: 'Shopping Mall', road: 'Road',
+                residential: 'Residential', suburb: 'Area', neighbourhood: 'Neighbourhood',
+                city: 'City', town: 'Town', village: 'Village'
+            };
+            return map[type] || map[cls] || (type ? type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ') : 'Location');
+        }
+
+        function attachOriginClickHandlers(box) {
+            box.querySelectorAll('.origin-suggestion-item').forEach(item => {
+                const fresh = item.cloneNode(true);
+                item.parentNode.replaceChild(fresh, item);
+                fresh.addEventListener('click', () => {
+                    const type = fresh.getAttribute('data-type');
+                    const name = fresh.getAttribute('data-name');
+                    const lat = parseFloat(fresh.getAttribute('data-lat'));
+                    const lng = parseFloat(fresh.getAttribute('data-lng'));
+
+                    box.style.display = 'none';
+                    document.getElementById('originSearch').value = '';
+
+                    if (type === 'station') {
+                        setOriginStation(name);       // known station: existing behaviour
+                    } else {
+                        setOriginFromGeo(name, lat, lng); // any other place: route via nearest station
+                    }
+                });
             });
         }
 
-        // --- 4. Fetch Data with Automatic Offline Backup ---
-        function fetchMalls() {
-            console.log("Connecting to local Flask backend...");
-            
-            fetch(backendUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error("HTTP error!");
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Loaded from local server database:", data);
-                    mallDatabase = data;
-                    renderMapMarkers(mallDatabase); 
-                })
-                .catch(error => {
-                    console.warn("Local Flask server not responding. Loading offline fallback dictionary array.");
-                    document.getElementById('statusDot').style.color = "#f59e0b"; 
-                    document.getElementById('activeFilterBadge').textContent = "Offline Mode: Using Backup Data";
+        // Renders / refreshes the Walk vs Drive toggle for the current geo-based first-mile leg.
+        // Doubles up to describe either "leg to the nearest station" (normal) or "leg straight to
+        // the mall" (when the direct-route shortcut has kicked in for the current destination).
+        function renderFirstMileToggle() {
+            const toggle = document.getElementById('firstMileToggle');
+            if (!originFirstMile) { toggle.style.display = 'none'; return; }
 
-                    // Robust generic local array setup to keep interface visually functional
-                    mallDatabase = [
-                        { "mall_name": "Sunway Velocity Mall", "station": "Maluri Station", "line": "Kajang Line", "latitude": 3.1275, "longitude": 101.7245, "categories": ["dining", "entertainment"], "best_exit": "Exit B (Link Bridge)", "walking_time_mins": 4 },
-                        { "mall_name": "The Exchange TRX", "station": "TRX Station", "line": "Kajang & Putrajaya Line", "latitude": 3.1425, "longitude": 101.7190, "categories": ["premium", "food court"], "best_exit": "Exit B (Direct Connection)", "walking_time_mins": 2 },
-                        { "mall_name": "Mid Valley Megamall", "station": "Abdullah Hukum Station", "line": "Kelana Jaya Line", "latitude": 3.1174, "longitude": 101.6773, "categories": ["cinemas", "grocery"], "best_exit": "Link Bridge", "walking_time_mins": 10 }
-                    ];
-                    
-                    renderMapMarkers(mallDatabase);
-                });
+            const isDirect = firstMileTarget === 'mall' && directRouteInfo;
+            const info = isDirect ? directRouteInfo : originFirstMile;
+
+            toggle.style.display = 'block';
+            document.getElementById('fmWalkTime').textContent = `~${info.walkMins} min`;
+            document.getElementById('fmDriveTime').textContent = `~${info.driveMins} min`;
+
+            document.getElementById('fmWalkBtn').classList.toggle('active', originFirstMile.mode === 'walk');
+            document.getElementById('fmDriveBtn').classList.toggle('active', originFirstMile.mode === 'drive');
+
+            const walkLabel = document.querySelector('#fmWalkBtn span:not(.fm-time)');
+            const driveLabel = document.querySelector('#fmDriveBtn span:not(.fm-time)');
+            if (walkLabel) walkLabel.textContent = isDirect ? 'Walk to Mall' : 'Walk';
+            if (driveLabel) driveLabel.textContent = isDirect ? 'Drive to Mall' : 'Drive / Grab';
+
+            const note = document.getElementById('firstMileNote');
+            if (isDirect) {
+                note.textContent = `The mall is only ${Math.round(directRouteInfo.meters)}m away — that's about as close as the nearest station, so it's quicker to skip the train and head straight there.`;
+            } else {
+                note.textContent = originFirstMile.meters > FIRST_MILE_DRIVE_SUGGEST_METERS
+                    ? `${Math.round(originFirstMile.meters)}m away — driving or grabbing a ride to the station is usually faster here.`
+                    : `${Math.round(originFirstMile.meters)}m away — an easy walk to the station.`;
+            }
         }
 
-        // --- 5. Category Toggling and Filtering ---
-        const filterButtons = document.querySelectorAll('.filter-grid .filter-btn');
-        const activeFilterBadge = document.getElementById('activeFilterBadge');
+        function setFirstMileMode(mode) {
+            if (!originFirstMile) return;
+            originFirstMile.mode = mode;
+            renderFirstMileToggle();
+            if (currentDestination) showRouteToDestination(currentDestination);
+        }
 
+        document.getElementById('fmWalkBtn').addEventListener('click', () => setFirstMileMode('walk'));
+        document.getElementById('fmDriveBtn').addEventListener('click', () => setFirstMileMode('drive'));
+
+        function setOriginFromGeo(label, lat, lng) {
+            // Find the closest transit station to the chosen place
+            const userLatLng = L.latLng(lat, lng);
+            let closestStation = null, shortest = Infinity;
+            allStationNames.forEach(name => {
+                const info = stationIndex[name];
+                const dist = map.distance(userLatLng, [info.lat, info.lng]);
+                if (dist < shortest) { shortest = dist; closestStation = name; }
+            });
+
+            // Drop the origin marker at the actual place (not the station)
+            if (originMarker) map.removeLayer(originMarker);
+            originMarker = L.marker([lat, lng], { icon: originIconTemplate, zIndexOffset: 1000 })
+                .addTo(map)
+                .bindPopup(`<strong>Your Starting Point</strong><br>${label}`);
+            map.flyTo([lat, lng], 14, { duration: 1 });
+
+            // Estimate both walk and drive times for this first-mile leg, and default to
+            // whichever makes more sense given the distance (driving wins past ~900m).
+            const { walkMins, driveMins } = estimateFirstMile(shortest);
+            const defaultMode = shortest > FIRST_MILE_DRIVE_SUGGEST_METERS ? 'drive' : 'walk';
+
+            originFirstMile = {
+                meters: shortest,
+                walkMins, driveMins,
+                mode: defaultMode,
+                stationName: closestStation,
+                label,
+                lat, lng
+            };
+
+            // Route via the nearest station, but show the human-friendly label
+            originStation = closestStation;
+            const activeMins = defaultMode === 'drive' ? driveMins : walkMins;
+            const modeIcon = defaultMode === 'drive' ? '🚗' : '🚶';
+            document.getElementById('originBadgeText').innerHTML =
+                `&#128205; ${label}<br><span style="font-size:0.7rem; color:var(--text-muted);">Nearest station: <strong>${closestStation}</strong> (${modeIcon} ~${activeMins} min ${defaultMode})</span>`;
+            document.getElementById('originBadge').style.display = 'flex';
+
+            renderFirstMileToggle();
+
+            clearRouteLayers();
+            if (currentDestination) showRouteToDestination(currentDestination);
+        }
+
+        document.getElementById('originSearch').addEventListener('input', (e) => renderOriginSuggestions(e.target.value));
+
+        document.getElementById('originClearBtn').addEventListener('click', () => {
+            originStation = null;
+            originFirstMile = null;
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            document.getElementById('originBadge').style.display = 'none';
+            document.getElementById('firstMileToggle').style.display = 'none';
+            if (originMarker) { map.removeLayer(originMarker); originMarker = null; }
+            clearRouteLayers();
+            document.getElementById('routePreview').innerHTML = currentDestination
+                ? (currentDestination.type === 'mall' ? simpleFallbackHTML(currentDestination.mall) : defaultRoutePreviewHTML())
+                : defaultRoutePreviewHTML();
+        });
+
+        document.getElementById('useMyLocationBtn').addEventListener('click', () => {
+            const btn = document.getElementById('useMyLocationBtn');
+            if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
+            navigator.geolocation.getCurrentPosition((pos) => {
+                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use My Current Location';
+                // Treat GPS position exactly like a geo-searched place: it's very unlikely the user
+                // is standing exactly on a station, so route the first mile (walk or drive) properly
+                // instead of silently snapping straight onto the nearest station with no leg shown.
+                setOriginFromGeo('My Current Location', pos.coords.latitude, pos.coords.longitude);
+            }, () => {
+                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use My Current Location';
+                alert('Unable to retrieve your location. Please allow location access or search for your station manually.');
+            });
+        });
+
+        // ====================================================
+        // 2e. DESTINATION UI (search malls + stations / autocomplete)
+        // ====================================================
+        let lastDestMatches = [];
+
+        function getDestinationSuggestions(term) {
+            const lower = term.toLowerCase();
+            const mallMatches = mallDatabase
+                .filter(m => {
+                    const textMatch = (m.mall_name && m.mall_name.toLowerCase().includes(lower)) ||
+                                      (m.station && m.station.toLowerCase().includes(lower)) ||
+                                      (m.line && m.line.toLowerCase().includes(lower));
+                    if (!textMatch) return false;
+                    // Respect the line pills
+                    if (currentLineFilter !== 'all' && !(m.line && m.line.includes(currentLineFilter))) return false;
+                    // Respect the category buttons
+                    if (activeCategory !== 'all') {
+                        const cats = Array.isArray(m.categories) ? m.categories : (typeof m.categories === 'string' ? m.categories.split(',') : []);
+                        const lc = cats.map(c => c.toLowerCase());
+                        if (activeCategory === 'grocery' && !lc.some(c => c.includes('grocer') || c.includes('supermarket'))) return false;
+                        if (activeCategory === 'cinema' && !lc.some(c => c.includes('cinema'))) return false;
+                        if (activeCategory === 'study' && !lc.some(c => c.includes('study') || c.includes('cafe'))) return false;
+                    }
+                    return true;
+                })
+                .slice(0, 5)
+                .map(m => ({ type: 'mall', label: m.mall_name, sub: m.station || 'Mall', mall: m }));
+            const stationMatches = allStationNames
+                .filter(n => n.toLowerCase().includes(lower))
+                .slice(0, 4)
+                .map(n => ({ type: 'station', label: n, sub: [...new Set(stationIndex[n].lines.map(l => l.name))].join(' / '), name: n }));
+            return [...mallMatches, ...stationMatches].slice(0, 7);
+        }
+
+        function destSuggestionItemHTML(match, idx) {
+            const iconHTML = match.type === 'mall'
+                ? `<i class="fa-solid fa-shop" style="color:var(--primary); width:14px;"></i>`
+                : `<i class="fa-solid fa-train-subway" style="color:${stationIndex[match.name].lines[0].color}; width:14px;"></i>`;
+            return `<div class="suggestion-item" data-index="${idx}">
+                ${iconHTML}
+                <div>
+                    <div style="font-weight:600;">${match.label}</div>
+                    <div style="font-size:0.7rem; color:var(--text-muted);">${match.sub}</div>
+                </div>
+            </div>`;
+        }
+
+        function renderDestSuggestions(term) {
+            const box = document.getElementById('destSuggestions');
+            if (!term) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+            lastDestMatches = getDestinationSuggestions(term);
+            if (lastDestMatches.length === 0) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+            box.innerHTML = lastDestMatches.map((m, idx) => destSuggestionItemHTML(m, idx)).join('');
+            box.style.display = 'block';
+            box.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const idx = parseInt(item.getAttribute('data-index'), 10);
+                    setDestination(lastDestMatches[idx]);
+                    box.style.display = 'none';
+                    document.getElementById('destSearch').value = '';
+                    applyFilters();
+                });
+            });
+        }
+
+        function setDestination(match) {
+            currentDestination = match;
+            document.getElementById('destBadge').style.display = 'flex';
+            document.getElementById('destBadgeText').innerHTML = `<i class="fa-solid fa-flag-checkered" style="color:var(--primary);"></i> To <strong>${match.label}</strong>`;
+            showRouteToDestination(match);
+        }
+
+        document.getElementById('destSearch').addEventListener('input', (e) => { renderDestSuggestions(e.target.value); applyFilters(); });
+
+        document.getElementById('destClearBtn').addEventListener('click', () => {
+            currentDestination = null;
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            renderFirstMileToggle();
+            document.getElementById('destBadge').style.display = 'none';
+            clearRouteLayers();
+            document.getElementById('routePreview').innerHTML = defaultRoutePreviewHTML();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#originWrapper')) document.getElementById('originSuggestions').style.display = 'none';
+            if (!e.target.closest('#destWrapper')) document.getElementById('destSuggestions').style.display = 'none';
+        });
+
+        // ====================================================
+        // 3. FULL-STACK FETCH & POPUP RENDERING
+        // ====================================================
+        const offlineBackupMalls = [
+            { "id": 1, "mall_name": "The Exchange TRX", "station": "TRX", "line": "Kajang & Putrajaya Line", "best_exit": "Exit B", "walking_time_mins": 2, "categories": ["Premium", "Food Court"], "coordinates": {"lat": 3.1425, "lon": 101.7190}, "description": "Kuala Lumpur's newest premium lifestyle destination featuring a massive rooftop park and luxury retail.", "operating_hours": "10:00 AM - 10:00 PM" },
+            { "id": 2, "mall_name": "Pavilion Bukit Bintang", "station": "Bukit Bintang", "line": "Kajang Line", "best_exit": "Exit D", "walking_time_mins": 5, "categories": ["Cinemas", "Shopping"], "coordinates": {"lat": 3.1480, "lon": 101.7145}, "description": "The crown jewel of Bukit Bintang shopping, famous for luxury boutiques and the Pavilion Crystal Fountain.", "operating_hours": "10:00 AM - 10:00 PM" },
+            { "id": 3, "mall_name": "1 Utama", "station": "Bandar Utama", "line": "Kajang Line", "best_exit": "Exit B", "walking_time_mins": 5, "categories": ["Entertainment", "Study Spots"], "coordinates": {"lat": 3.1488, "lon": 101.6158}, "description": "One of the largest malls in Malaysia with GSC Cinema, Cold Storage, and hundreds of F&B options including affordable food courts.", "operating_hours": "10:00 AM - 10:00 PM (10:30 PM on Weekends)" }
+        ];
+
+        function renderMapMarkers(mallsList) {
+            markerGroup.clearLayers();
+            clearRouteLayers();
+
+            mallsList.forEach(mall => {
+                const lat = mall.latitude || (mall.coordinates ? mall.coordinates.lat : null);
+                const lon = mall.longitude || (mall.coordinates ? mall.coordinates.lon : null);
+                if (!lat || !lon) return;
+
+                let cats = Array.isArray(mall.categories) ? mall.categories : (typeof mall.categories === 'string' ? mall.categories.split(',') : []);
+                let desc = mall.description || "A popular transit-connected destination offering various retail, dining, and lifestyle experiences.";
+                let hours = mall.operating_hours || mall.hours || "10:00 AM - 10:00 PM";
+
+                const marker = L.marker([lat, lon], { icon: mallIconTemplate });
+                
+                const popupContent = `
+                    <div style="padding:6px; min-width:240px;">
+                        <h3 style="font-size:16px; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">${mall.mall_name}</h3>
+                        <div style="display:flex; align-items:center; gap:6px; margin-bottom:12px;">
+                            <span style="background:rgba(99, 102, 241, 0.2); color:var(--primary); padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">${mall.line || 'Line N/A'}</span>
+                            <span style="font-size:12px; color:var(--text-muted);">${mall.station || 'Station N/A'}</span>
+                        </div>
+                        
+                        <p style="font-size:12px; line-height:1.5; margin:0 0 10px 0; color:var(--text-muted);">${desc}</p>
+                        <div style="font-size:12px; font-weight:600; color:#10b981; margin-bottom:12px;"><i class="fa-regular fa-clock"></i> ${hours}</div>
+
+                        <div style="font-size:12px; color:var(--text-main); margin-bottom:12px; display:flex; gap:12px; background:var(--bg-base); padding:8px; border-radius:6px; border:1px solid var(--border-color);">
+                            <span>🚶 ${mall.walking_time_mins || '?'} min</span>
+                            <span>🚪 ${mall.best_exit || 'Check Exit'}</span>
+                        </div>
+                        
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                            ${cats.map(c => `<span style="background:var(--bg-base); padding:4px 8px; border-radius:12px; font-size:10px; font-weight:600; border:1px solid var(--border-color); color:var(--text-main);">${c.trim()}</span>`).join('')}
+                        </div>
+                        
+                        <button onclick="routeFromPopup('${encodeURIComponent(mall.mall_name)}')" style="display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top: 14px; background: var(--primary); color: white; text-align: center; padding: 8px; border-radius: 6px; border:none; font-weight: 600; font-size: 0.85rem; cursor:pointer; transition:0.2s; font-family:inherit;">
+                            <i class="fa-solid fa-route"></i> Route Me Here
+                        </button>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=transit" target="_blank" style="display:block; text-align:center; margin-top:8px; font-size:0.72rem; color:var(--text-muted); text-decoration:underline;">
+                            Open in Google Maps instead
+                        </a>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+
+                marker.on('click', () => {
+                    setDestination({ type: 'mall', label: mall.mall_name, sub: mall.station || 'Mall', mall });
+                });
+
+                markerGroup.addLayer(marker);
+            });
+        }
+
+        // --- 4. Fetch Data & Initialization ---
+        function fetchMalls() {
+            fetch(backendUrl).then(res => { if (!res.ok) throw new Error(); return res.json(); })
+            .then(data => { 
+                mallDatabase = data; 
+                renderMapMarkers(mallDatabase); 
+            })
+            .catch(() => {
+                document.getElementById('statusDot').style.color = "#f59e0b"; 
+                document.getElementById('activeFilterBadge').textContent = "Offline Mode";
+                document.getElementById('errorBanner').style.display = "block";
+                document.getElementById('errorBanner').innerText = "⚠️ OFFLINE MODE: Server is currently offline. Using local backup.";
+                mallDatabase = offlineBackupMalls;
+                renderMapMarkers(mallDatabase);
+            });
+        }
+
+        // --- 5. MASTER FILTERING LOGIC ---
+        function applyFilters() {
+            const searchTerm = document.getElementById('destSearch').value.toLowerCase();
+            
+            if (mallDatabase.length === 0) return;
+
+            let filteredMalls = mallDatabase.filter(mall => {
+                // 1. Category check
+                let catMatch = true;
+                if (activeCategory !== 'all') {
+                    let cats = Array.isArray(mall.categories) ? mall.categories : (typeof mall.categories === 'string' ? mall.categories.split(',') : []);
+                    let lower = cats.map(c => c.toLowerCase());
+                    if (activeCategory === 'grocery') catMatch = lower.some(c => c.includes('grocer') || c.includes('supermarket'));
+                    if (activeCategory === 'cinema') catMatch = lower.some(c => c.includes('cinema'));
+                    if (activeCategory === 'study') catMatch = lower.some(c => c.includes('study') || c.includes('cafe'));
+                }
+
+                // 2. Line check (from Pill Buttons)
+                let lineMatch = currentLineFilter === 'all' ? true : (mall.line && mall.line.includes(currentLineFilter));
+
+                // 3. Search check
+                let searchMatch = true;
+                if (searchTerm) {
+                    searchMatch = (mall.mall_name && mall.mall_name.toLowerCase().includes(searchTerm)) || 
+                                  (mall.station && mall.station.toLowerCase().includes(searchTerm)) ||
+                                  (mall.line && mall.line.toLowerCase().includes(searchTerm));
+                }
+
+                return catMatch && lineMatch && searchMatch;
+            });
+
+            renderMapMarkers(filteredMalls);
+        }
+
+        // Attach listeners to Line Pills
+        document.querySelectorAll('.line-pill').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.line-pill').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentLineFilter = e.target.getAttribute('data-line');
+                applyFilters();
+            });
+        });
+
+        // Category Buttons
+        const filterButtons = document.querySelectorAll('.filter-grid .filter-btn');
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                
-                const category = button.getAttribute('data-category');
-                // FIXED THE BACKTICK BUG HERE
-                activeFilterBadge.textContent = `Showing: ${button.textContent.trim().substring(2)}`;
-                
-                filterMapMarkers(category);
+                activeCategory = button.getAttribute('data-category');
+                applyFilters();
             });
         });
 
-        function filterMapMarkers(category) {
-            if (mallDatabase.length === 0) return;
-            let filteredMalls = mallDatabase;
-
-            if (category !== 'all') {
-                filteredMalls = mallDatabase.filter(mall => {
-                    if (!mall.categories) return false;
-                    const lowerCategories = mall.categories.map(c => c.toLowerCase());
-                    if (category === 'grocery') return lowerCategories.some(c => c.includes('grocer') || c.includes('supermarket') || c.includes('home'));
-                    if (category === 'cinema') return lowerCategories.some(c => c.includes('cinema') || c.includes('entertainment'));
-                    if (category === 'study') return lowerCategories.some(c => c.includes('quiet') || c.includes('study') || c.includes('cafe'));
-                    return false;
-                });
-            }
-            renderMapMarkers(filteredMalls);
-        }
-
-        // --- 6. Live Search Feature (Updated to parse the 'line' key) ---
-        document.getElementById('mallSearch').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const searchedMalls = mallDatabase.filter(mall => 
-                (mall.mall_name && mall.mall_name.toLowerCase().includes(searchTerm)) || 
-                (mall.station && mall.station.toLowerCase().includes(searchTerm)) ||
-                (mall.line && mall.line.toLowerCase().includes(searchTerm))
-            );
-            renderMapMarkers(searchedMalls);
-        });
-
-        // --- 7. Interactive UI Tip Submissions ---
-        document.getElementById('uiTipForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const location = document.getElementById('uiTipLoc').value;
-            const text = document.getElementById('uiTipTxt').value;
-
-            const card = document.createElement('div');
-            card.className = 'tip-card';
-            card.innerHTML = `
-                <div class="tip-meta">
-                    <span>📍 ${location}</span>
-                    <span>@You (Just Now)</span>
-                </div>
-                <p>${text}</p>
-            `;
-
-            const feed = document.getElementById('tipsFeed');
-            feed.insertBefore(card, feed.firstChild);
-            document.getElementById('uiTipForm').reset();
-        });
-
-        // --- 8. GPS: Find Nearest Mall ---
-        document.getElementById('locateBtn').addEventListener('click', () => {
-            // Asks the browser for permission and zooms in
-            map.locate({setView: true, maxZoom: 13}); 
-        });
-
-        // If the user clicks "Allow" on the location popup:
+        // GPS ("Locate Me" on the map — finds nearest mall, separate from the trip-planner GPS button)
+        document.getElementById('locateBtn').addEventListener('click', () => map.locate({setView: true, maxZoom: 13}));
         map.on('locationfound', (e) => {
-            const userLoc = e.latlng;
-
-            // Drop a red circle where the user is standing
-            L.circle(userLoc, { radius: 150, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.5 }).addTo(map)
-                .bindPopup("<b>📍 You Are Here!</b>").openPopup();
-
-            // Math: Find the closest mall
-            let closestMall = null;
-            let shortestDistance = Infinity;
-
-            mallDatabase.forEach(mall => {
-                const lat = mall.latitude || (mall.coordinates ? mall.coordinates.lat : null);
-                const lon = mall.longitude || (mall.coordinates ? mall.coordinates.lon : null);
-
+            L.circle(e.latlng, { radius: 150, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.5 }).addTo(map).bindPopup("<b style='color:var(--text-main)'>📍 You Are Here!</b>").openPopup();
+            
+            let closestMall = null; let shortest = Infinity;
+            mallDatabase.forEach(m => {
+                const lat = m.latitude || (m.coordinates ? m.coordinates.lat : null);
+                const lon = m.longitude || (m.coordinates ? m.coordinates.lon : null);
                 if(lat && lon) {
-                    const distance = map.distance(userLoc, [lat, lon]); // Leaflet calculates the meters!
-                    if (distance < shortestDistance) {
-                        shortestDistance = distance;
-                        closestMall = mall;
-                    }
+                    const dist = map.distance(e.latlng, [lat, lon]); 
+                    if (dist < shortest) { shortest = dist; closestMall = m; }
                 }
             });
-
-            // Alert the user!
-            if (closestMall) {
-                setTimeout(() => {
-                    alert(`GPS LOCATED: The closest mall to you is ${closestMall.mall_name} (${(shortestDistance/1000).toFixed(1)} km away)!`);
-                }, 600);
-            }
+            if (closestMall) setTimeout(() => alert(`GPS LOCATED: The closest mall to you is ${closestMall.mall_name} (${(shortest/1000).toFixed(1)} km away)!`), 600);
         });
 
-        // If the user blocks location permissions:
-        map.on('locationerror', (e) => {
-            alert("Couldn't find your location! Make sure you clicked 'Allow' when the browser asked for permission.");
+        // Tips
+        document.getElementById('uiTipForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const loc = document.getElementById('uiTipLoc').value; const text = document.getElementById('uiTipTxt').value;
+            const card = document.createElement('div'); card.className = 'tip-card';
+            card.innerHTML = `<div class="tip-meta"><span>📍 ${loc}</span><span>@You</span></div><p>${text}</p>`;
+            document.getElementById('tipsFeed').prepend(card); document.getElementById('uiTipForm').reset();
         });
 
         fetchMalls();
