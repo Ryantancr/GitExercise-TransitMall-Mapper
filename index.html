@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitMall Mapper | Full-Stack Edition</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
+        #map { width: 100vw; height: 100vh; background-color: #222; }
+
+        /* --- THE CSS TRICK (DARK MODE) --- */
+        .dark-mode-map .leaflet-tile-pane {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        /* --- UI CONTROLS --- */
+        .control-btn {
+            position: absolute; right: 20px; z-index: 1000; padding: 10px 16px;
+            border: 2px solid rgba(0, 0, 0, 0.2); border-radius: 6px; cursor: pointer;
+            font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.2s ease-in-out;
+        }
+        .control-btn:hover { transform: scale(1.05); }
+        #themeToggleBtn { top: 20px; background-color: #ffffff; color: #111111; }
+        #locateBtn { top: 70px; background-color: #1D3557; color: white; border-color: #1D3557; }
+
+        /* --- FILTER BAR --- */
+        .filter-container {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; background-color: rgba(255, 255, 255, 0.95); padding: 10px 15px;
+            border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; gap: 10px; backdrop-filter: blur(5px);
+        }
+        .filter-btn {
+            background-color: #f1f1f1; border: none; padding: 8px 16px;
+            border-radius: 20px; cursor: pointer; font-weight: bold; color: #333; transition: all 0.2s ease;
+        }
+        .filter-btn:hover, .filter-btn.active { background-color: #E63946; color: white; }
+
+        /* --- CUSTOM MAP ICONS --- */
+        .custom-icon-wrapper {
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%; box-shadow: 0 3px 6px rgba(0,0,0,0.3); border: 2px solid #ffffff;
+        }
+        .mall-icon { background-color: #E63946; width: 30px; height: 30px; }
+        .custom-icon-wrapper svg { width: 18px; height: 18px; fill: #ffffff; }
+
+        /* --- BULLETPROOF ERROR BANNER --- */
+        #errorBanner {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; 
+            background-color: #E63946; color: white; text-align: center; 
+            padding: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* --- CUSTOM POPUP DESIGN --- */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            padding: 5px;
+        }
+        
+        .custom-popup {
+            font-family: sans-serif;
+            min-width: 220px;
+        }
+        
+        .custom-popup h3 {
+            margin: 0 0 5px 0;
+            color: #1D3557;
+            font-size: 16px;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 8px;
+        }
+
+        .station-subtitle {
+            color: #666;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .exit-box {
+            background-color: #F1FAEE;
+            border-left: 4px solid #457B9D;
+            padding: 8px 10px;
+            margin: 12px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .exit-box strong { 
+            color: #1D3557; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .exit-text { 
+            color: #457B9D; 
+            font-weight: bold; 
+            font-size: 14px; 
+            display: block; 
+            margin-top: 4px; 
+        }
+
+        .vibe-container {
+            margin-top: 10px;
+        }
+        
+        .vibe-title {
+            font-size: 11px; 
+            color: #888;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .vibe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            background-color: #E63946;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(230, 57, 70, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="errorBanner"></div>
+
+    <button class="control-btn" id="themeToggleBtn">🌙 Dark Mode</button>
+    <button class="control-btn" id="locateBtn">📍 Locate Me</button>
+
+    <div class="filter-container">
+        <button class="filter-btn active" data-walk="all">All Malls</button>
+        <button class="filter-btn" data-walk="5">Quick Walk (< 5 Mins)</button>
+        <button class="filter-btn" data-walk="10">Medium Walk (< 10 Mins)</button>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <script>
+        // 1. Initialize Map
+        const map = L.map('map').setView([3.1390, 101.6869], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 2. Dark Mode Logic
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const mapContainer = document.getElementById('map');
+        let isDarkMode = false;
+        themeToggleBtn.addEventListener('click', () => {
+            if (isDarkMode) {
+                mapContainer.classList.remove('dark-mode-map');
+                themeToggleBtn.innerText = "🌙 Dark Mode";
+                themeToggleBtn.style.backgroundColor = "#ffffff";
+                themeToggleBtn.style.color = "#111111";
+            } else {
+                mapContainer.classList.add('dark-mode-map');
+                themeToggleBtn.innerText = "☀️ Light Mode";
+                themeToggleBtn.style.backgroundColor = "#222222";
+                themeToggleBtn.style.color = "#ffffff";
+            }
+            isDarkMode = !isDarkMode;
+        }); 
+
+        // 3. GPS "Locate Me" Logic
+        const locateBtn = document.getElementById('locateBtn');
+        let userMarker; 
+        locateBtn.addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
+        map.on('locationfound', function(e) {
+            if (userMarker) { map.removeLayer(userMarker); }
+            userMarker = L.circleMarker(e.latlng, { radius: 8, fillColor: "#4285F4", color: "#ffffff", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map).bindPopup("<b>You are here!</b>").openPopup();
+        });
+
+        map.on('locationerror', function(e) {
+            alert("Could not find your location. Please ensure location services are enabled in your browser.");
+        });
+
+        // 4. Custom Icons
+        const mallIcon = L.divIcon({
+            className: 'custom-icon-wrapper mall-icon',
+            html: `<svg viewBox="0 0 24 24"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>`,
+            iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -15] 
+        });
+
+        function createStationIcon(hexColor) {
+            return L.divIcon({
+                className: 'custom-icon-wrapper',
+                html: `<div style="background-color: ${hexColor}; width: 100%; height: 100%; border-radius: 50%; display: flex; justify-content: center; align-items: center;"><svg viewBox="0 0 24 24"><path d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-4-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-4.5-6H8V7h8v4h-3z"/></svg></div>`,
+                iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]
+            });
+        }
+
+        // 5. Hardcoded Transit Context 
+        const transitLines = [
+            {
+                "name": "MRT Kajang Line", "color": "#00785B", 
+                "coordinates": [ [3.1765, 101.5724], [3.1488, 101.6158], [3.1444, 101.7118], [3.1428, 101.7188], [3.1251, 101.7280], [2.9835, 101.7904] ],
+                "stations": [
+                    { "name": "Kwasa Damansara", "lat": 3.1765, "lng": 101.5724 },
+                    { "name": "Bandar Utama", "lat": 3.1488, "lng": 101.6158 },
+                    { "name": "Bukit Bintang", "lat": 3.1444, "lng": 101.7118 },
+                    { "name": "TRX", "lat": 3.1428, "lng": 101.7188 },
+                    { "name": "Maluri", "lat": 3.1251, "lng": 101.7280 },
+                    { "name": "Kajang", "lat": 2.9835, "lng": 101.7904 }
+                ]
+            },
+            {
+                "name": "MRT Putrajaya Line", "color": "#FFD100", 
+                "coordinates": [ [3.1765, 101.5724], [3.1733, 101.6953], [3.1583, 101.7188], [3.1428, 101.7188], [2.9324, 101.6692] ],
+                "stations": [
+                    { "name": "Titiwangsa", "lat": 3.1733, "lng": 101.6953 },
+                    { "name": "Ampang Park", "lat": 3.1583, "lng": 101.7188 },
+                    { "name": "Putrajaya Sentral", "lat": 2.9324, "lng": 101.6692 }
+                ]
+            }
+        ];
+
+        transitLines.forEach(line => {
+            L.polyline(line.coordinates, { color: line.color, weight: 6, opacity: 0.8 }).addTo(map);
+            if (line.stations) {
+                line.stations.forEach(station => {
+                    L.marker([station.lat, station.lng], { icon: createStationIcon(line.color) }).addTo(map).bindPopup(`<b>${station.name}</b><br><small>${line.name}</small>`); 
+                });
+            }
+        });
+
+        function findStationCoords(stationName) {
+            for (let line of transitLines) {
+                for (let st of line.stations) {
+                    if (stationName.includes(st.name)) return [st.lat, st.lng];
+                }
+            }
+            return null;
+        }
+
+        // ================================================
+        // 6. TRUE FULL-STACK FETCH & CLUSTERING
+        // ================================================
+        
+        // ACTIVATED RYAN'S MARKER CLUSTER FEATURE
+        let mallLayerGroup = L.markerClusterGroup({
+            maxClusterRadius: 50,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true
+        }).addTo(map);
+        
+        let activeWalkingPath = null;
+        const errorBanner = document.getElementById('errorBanner');
+        
+        // RYAN'S NEW PORT 5001 URL
+        const RYAN_SERVER_URL = "https://298t6s1c-5001.asse.devtunnels.ms/";
+
+        const offlineBackupMalls = [
+            { "id": 1, "mall_name": "The Exchange TRX", "station": "TRX Station", "best_exit": "Exit B", "walking_time_mins": 2, "categories": ["Premium", "Food Court"], "coordinates": {"lat": 3.1425, "lon": 101.7190} },
+            { "id": 2, "mall_name": "Pavilion Bukit Bintang", "station": "Bukit Bintang Station", "best_exit": "Exit D", "walking_time_mins": 5, "categories": ["Cinemas", "Shopping"], "coordinates": {"lat": 3.1480, "lon": 101.7145} },
+            { "id": 3, "mall_name": "1 Utama", "station": "Bandar Utama Station", "best_exit": "Exit B", "walking_time_mins": 5, "categories": ["Entertainment", "Study Spots"], "coordinates": {"lat": 3.1488, "lon": 101.6158} }
+        ];
+
+        function drawMallsOnMap(mallsData) {
+            mallLayerGroup.clearLayers(); 
+            if (activeWalkingPath) { map.removeLayer(activeWalkingPath); }
+
+            if (mallsData && mallsData.error) {
+                alert("Search Result: " + mallsData.error);
+                return; 
+            }
+
+            // Fallback safety to prevent loop crash
+            let safeMalls = Array.isArray(mallsData) ? mallsData : (mallsData.malls || []);
+
+            safeMalls.forEach(mall => {
+                // Failsafe for coordinates
+                let lat = mall.coordinates ? mall.coordinates.lat : (mall.latitude || mall.lat);
+                let lon = mall.coordinates ? mall.coordinates.lon : (mall.longitude || mall.lng);
+                
+                if (!lat || !lon) return;
+                
+                // Failsafe for categories
+                let cats = Array.isArray(mall.categories) ? mall.categories : (typeof mall.categories === 'string' ? mall.categories.split(',') : []);
+
+                let popupHTML = `
+                    <div class="custom-popup">
+                        <h3>🛍️ ${mall.mall_name || 'Mall'}</h3>
+                        <div class="station-subtitle">
+                            🚉 <span>${mall.station || 'Unknown Station'}</span>
+                        </div>
+                        
+                        <div class="exit-box">
+                            <strong>🚪 Best Route</strong>
+                            <span class="exit-text">${mall.best_exit || 'Check exit'}</span>
+                            <span style="font-size: 11px; color: #555; display: block; margin-top: 4px;">
+                                ⏱️ ${mall.walking_time_mins || mall.walking_time || '5'} min walk
+                            </span>
+                        </div>
+
+                        <div class="vibe-container">
+                            <span class="vibe-title">✨ Student Vibe</span>
+                            <div class="vibe-tags">
+                                ${cats.map(category => `<span class="tag">${category.trim()}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                let marker = L.marker([lat, lon], { icon: mallIcon })
+                .bindPopup(popupHTML);
+                
+                // Add to the cluster group instead of directly to map
+                mallLayerGroup.addLayer(marker);
+
+                marker.on('click', () => {
+                    if (activeWalkingPath) { map.removeLayer(activeWalkingPath); }
+                    if (mall.station) {
+                        let stationCoords = findStationCoords(mall.station);
+                        if (stationCoords) {
+                            activeWalkingPath = L.polyline([ [lat, lon], stationCoords ], {
+                                color: '#E63946', weight: 4, dashArray: '5, 10', lineJoin: 'round'
+                            }).addTo(map);
+                        }
+                    }
+                });
+            });
+        }
+
+        function fetchAndRenderMalls(apiUrl, walkFilter = "all") {
+            errorBanner.style.display = 'none';
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok && response.status !== 404) { 
+                        throw new Error("Backend crashed."); 
+                    }
+                    return response.json();
+                })
+                .then(mallsData => {
+                    drawMallsOnMap(mallsData);
+                })
+                .catch(error => {
+                    console.error("Fetch Error:", error);
+                    
+                    errorBanner.style.backgroundColor = "#FCA311";
+                    errorBanner.innerText = "⚠️ OFFLINE MODE: Server is currently offline. Displaying local backup data.";
+                    errorBanner.style.display = 'block'; 
+
+                    let backupData = offlineBackupMalls;
+                    if (walkFilter !== "all") {
+                        backupData = offlineBackupMalls.filter(m => m.walking_time_mins <= parseInt(walkFilter));
+                    }
+                    
+                    if (backupData.length === 0) {
+                        drawMallsOnMap({ error: "No malls found within that walking distance" });
+                    } else {
+                        drawMallsOnMap(backupData);
+                    }
+                });
+        }
+
+        fetchAndRenderMalls(`${RYAN_SERVER_URL}/api/malls`, "all");
+
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const walkTime = e.target.getAttribute('data-walk');
+                if (walkTime === "all") {
+                    fetchAndRenderMalls(`${RYAN_SERVER_URL}/api/malls`, "all");
+                } else {
+                    fetchAndRenderMalls(`${RYAN_SERVER_URL}/api/malls/walk/${walkTime}`, walkTime);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
