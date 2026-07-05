@@ -302,6 +302,12 @@
         // null whenever the origin IS a real station (no first-mile leg needed).
         let originFirstMile = null; // { meters, walkMins, driveMins, mode: 'walk'|'drive', stationName, label, lat, lng }
 
+        // Whenever the currently-selected mall turns out to be about as close (or closer) to the
+        // origin than the nearest station, we bypass the train entirely. These two track that state
+        // so the Walk/Drive toggle and route renderer know to talk about "the mall" instead of "the station".
+        let directRouteInfo = null;      // { meters, walkMins, driveMins } straight to the mall, when active
+        let firstMileTarget = 'station'; // 'station' (normal) or 'mall' (direct-route shortcut active)
+
         // Rough time assumptions for KV rail (used only to produce an estimate, not live schedule data).
         // IMPORTANT: this map only lists a curated subset of each line's real stations, so a "hop"
         // between two listed stations can quietly span several real stations and many km. Timing must
@@ -328,6 +334,13 @@
         const DRIVE_OVERHEAD_MIN = 6;       // fixed overhead: unparking/parking, or waiting for a Grab to arrive
         // Distance beyond which we default to suggesting "Drive" instead of "Walk" for the first mile
         const FIRST_MILE_DRIVE_SUGGEST_METERS = 900;
+
+        // --- DIRECT-TO-MALL SHORTCUT ---
+        // If the mall itself is about as close to the origin as the nearest station is, taking the
+        // train makes no sense — you'd walk/drive past (or near) the mall just to catch a ride back.
+        // In that case we skip the whole rail route and just send the user straight to the mall.
+        const DIRECT_VS_STATION_SLACK = 1.2;      // mall can be up to 20% farther than the nearest station and we STILL go direct
+        const DIRECT_ROUTE_ABS_CAP_METERS = 3000; // never suggest a "direct" route beyond ~3km either way
 
         // Real official figures: line length (km) / (official station count - 1) = average real gap.
         // Source: MRT Corp / Rapid KL published line lengths and station counts.
@@ -828,6 +841,32 @@
             `;
         }
 
+        // Shown when the direct-route shortcut is active: the mall is close enough that taking
+        // the train would be pointless, so we just send the user straight there.
+        function directRouteHTML(destLabel, mode, mins, meters) {
+            const icon = mode === 'drive' ? 'fa-car' : 'fa-person-walking';
+            const verb = mode === 'drive' ? 'Drive / Grab' : 'Walk';
+            return `
+                <h3 style="margin:0 0 10px 0; color:var(--text-main); font-size:1rem; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+                    Journey to ${destLabel}
+                </h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 10px 0;">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Good news — <strong>${destLabel}</strong> is only about ${Math.round(meters)}m away, roughly as close as the nearest MRT/LRT station. No point taking the train for this one.
+                </p>
+                <div style="display:grid; grid-template-columns:20px 1fr; gap:8px; margin-bottom:10px; line-height:1.4;">
+                    <i class="fa-solid ${icon}" style="color:#10b981; margin-top:3px; font-size:0.85rem;"></i>
+                    <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">${verb} straight there</strong><br><span style="color:var(--text-main);">Direct to ${destLabel}</span></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:8px; padding:10px 12px; margin-bottom:10px;">
+                    <span style="font-size:0.8rem; color:var(--text-main);"><i class="fa-solid fa-stopwatch"></i> Total journey time</span>
+                    <span style="font-size:1.15rem; font-weight:800; color:#10b981;">~${mins} min</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:8px;">
+                    <i class="fa-solid fa-lightbulb"></i> Use the Walk / Drive toggle above to compare options. Estimate only — actual time may vary with traffic or route.
+                </div>
+            `;
+        }
+
         function simpleFallbackHTML(mall) {
             return `
                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
@@ -917,6 +956,37 @@
                 document.getElementById('routePreview').innerHTML = `<p style="margin:0; color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> <strong>${destLabel}</strong> is missing map coordinates in the mall database, so a route can't be drawn for it yet.</p>`;
                 return;
             }
+
+            // --- DIRECT-TO-MALL SHORTCUT CHECK ---
+            // Only relevant when the origin is a free-text/geo place (originFirstMile set) heading to
+            // a mall. If the mall itself sits about as close (or closer) to the origin as the nearest
+            // station does, there's no benefit to catching a train — just send the user straight there.
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            if (mall && originFirstMile) {
+                const directMeters = map.distance([originFirstMile.lat, originFirstMile.lng], [destLat, destLon]);
+                if (directMeters <= DIRECT_ROUTE_ABS_CAP_METERS && directMeters <= originFirstMile.meters * DIRECT_VS_STATION_SLACK) {
+                    const est = estimateFirstMile(directMeters);
+                    directRouteInfo = { meters: directMeters, walkMins: est.walkMins, driveMins: est.driveMins };
+                    firstMileTarget = 'mall';
+                }
+            }
+            renderFirstMileToggle();
+
+            if (firstMileTarget === 'mall') {
+                map.flyTo([destLat, destLon], 15, { duration: 1.2 });
+                const mode = originFirstMile.mode;
+                const mins = mode === 'drive' ? directRouteInfo.driveMins : directRouteInfo.walkMins;
+                const color = mode === 'drive' ? '#f59e0b' : '#10b981';
+                const directLine = L.polyline(
+                    [[originFirstMile.lat, originFirstMile.lng], [destLat, destLon]],
+                    { color, weight: 5, dashArray: '2, 8' }
+                ).addTo(map);
+                activeRouteLayers.push(directLine);
+                document.getElementById('routePreview').innerHTML = directRouteHTML(destLabel, mode, mins, directRouteInfo.meters);
+                return;
+            }
+
             map.flyTo([destLat, destLon], 15, { duration: 1.2 });
 
             // No starting point set yet
@@ -1058,6 +1128,8 @@
             if (!stationIndex[name]) return;
             originStation = name;
             originFirstMile = null; // picked a real station directly -> no first-mile leg
+            directRouteInfo = null;
+            firstMileTarget = 'station';
             document.getElementById('firstMileToggle').style.display = 'none';
             const info = stationIndex[name];
             const lineNames = [...new Set(info.lines.map(l => l.name))].join(' / ');
@@ -1213,22 +1285,36 @@
             });
         }
 
-        // Renders / refreshes the Walk vs Drive toggle for the current geo-based first-mile leg
+        // Renders / refreshes the Walk vs Drive toggle for the current geo-based first-mile leg.
+        // Doubles up to describe either "leg to the nearest station" (normal) or "leg straight to
+        // the mall" (when the direct-route shortcut has kicked in for the current destination).
         function renderFirstMileToggle() {
             const toggle = document.getElementById('firstMileToggle');
             if (!originFirstMile) { toggle.style.display = 'none'; return; }
 
+            const isDirect = firstMileTarget === 'mall' && directRouteInfo;
+            const info = isDirect ? directRouteInfo : originFirstMile;
+
             toggle.style.display = 'block';
-            document.getElementById('fmWalkTime').textContent = `~${originFirstMile.walkMins} min`;
-            document.getElementById('fmDriveTime').textContent = `~${originFirstMile.driveMins} min`;
+            document.getElementById('fmWalkTime').textContent = `~${info.walkMins} min`;
+            document.getElementById('fmDriveTime').textContent = `~${info.driveMins} min`;
 
             document.getElementById('fmWalkBtn').classList.toggle('active', originFirstMile.mode === 'walk');
             document.getElementById('fmDriveBtn').classList.toggle('active', originFirstMile.mode === 'drive');
 
+            const walkLabel = document.querySelector('#fmWalkBtn span:not(.fm-time)');
+            const driveLabel = document.querySelector('#fmDriveBtn span:not(.fm-time)');
+            if (walkLabel) walkLabel.textContent = isDirect ? 'Walk to Mall' : 'Walk';
+            if (driveLabel) driveLabel.textContent = isDirect ? 'Drive to Mall' : 'Drive / Grab';
+
             const note = document.getElementById('firstMileNote');
-            note.textContent = originFirstMile.meters > FIRST_MILE_DRIVE_SUGGEST_METERS
-                ? `${Math.round(originFirstMile.meters)}m away — driving or grabbing a ride to the station is usually faster here.`
-                : `${Math.round(originFirstMile.meters)}m away — an easy walk to the station.`;
+            if (isDirect) {
+                note.textContent = `The mall is only ${Math.round(directRouteInfo.meters)}m away — that's about as close as the nearest station, so it's quicker to skip the train and head straight there.`;
+            } else {
+                note.textContent = originFirstMile.meters > FIRST_MILE_DRIVE_SUGGEST_METERS
+                    ? `${Math.round(originFirstMile.meters)}m away — driving or grabbing a ride to the station is usually faster here.`
+                    : `${Math.round(originFirstMile.meters)}m away — an easy walk to the station.`;
+            }
         }
 
         function setFirstMileMode(mode) {
@@ -1291,6 +1377,8 @@
         document.getElementById('originClearBtn').addEventListener('click', () => {
             originStation = null;
             originFirstMile = null;
+            directRouteInfo = null;
+            firstMileTarget = 'station';
             document.getElementById('originBadge').style.display = 'none';
             document.getElementById('firstMileToggle').style.display = 'none';
             if (originMarker) { map.removeLayer(originMarker); originMarker = null; }
@@ -1395,6 +1483,9 @@
 
         document.getElementById('destClearBtn').addEventListener('click', () => {
             currentDestination = null;
+            directRouteInfo = null;
+            firstMileTarget = 'station';
+            renderFirstMileToggle();
             document.getElementById('destBadge').style.display = 'none';
             clearRouteLayers();
             document.getElementById('routePreview').innerHTML = defaultRoutePreviewHTML();
