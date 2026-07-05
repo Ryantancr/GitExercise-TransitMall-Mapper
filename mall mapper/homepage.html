@@ -81,6 +81,16 @@
         .dest-badge { background: rgba(99, 102, 241, 0.12); border-color: var(--primary); }
         .use-location-btn { width: 100%; margin-top: 12px; box-sizing: border-box; }
 
+        /* --- FIRST-MILE MODE TOGGLE (Walk vs Drive to nearest station) --- */
+        .firstmile-toggle { display: none; margin-top: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
+        .firstmile-toggle-row { display: flex; }
+        .firstmile-toggle-btn { flex: 1; background: var(--bg-base); border: none; padding: 8px 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border-right: 1px solid var(--border-color); transition: 0.15s; }
+        .firstmile-toggle-btn:last-child { border-right: none; }
+        .firstmile-toggle-btn .fm-time { font-size: 0.85rem; font-weight: 800; }
+        .firstmile-toggle-btn.active { background: rgba(16, 185, 129, 0.18); color: #10b981; }
+        .firstmile-toggle-btn:hover:not(.active) { color: var(--text-main); }
+        .firstmile-note { font-size: 0.68rem; color: var(--text-muted); padding: 6px 10px 0 10px; }
+
         /* PILL BUTTONS FOR LINE FILTER */
         .pill-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
         .pill-scroll-container::-webkit-scrollbar { display: none; }
@@ -159,6 +169,21 @@
                 <div class="route-badge origin-badge" id="originBadge">
                     <span id="originBadgeText"></span>
                     <button id="originClearBtn" title="Clear starting point"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="firstmile-toggle" id="firstMileToggle">
+                    <div class="firstmile-toggle-row">
+                        <button type="button" class="firstmile-toggle-btn" id="fmWalkBtn" data-mode="walk">
+                            <i class="fa-solid fa-person-walking"></i>
+                            <span>Walk</span>
+                            <span class="fm-time" id="fmWalkTime">--</span>
+                        </button>
+                        <button type="button" class="firstmile-toggle-btn" id="fmDriveBtn" data-mode="drive">
+                            <i class="fa-solid fa-car"></i>
+                            <span>Drive / Grab</span>
+                            <span class="fm-time" id="fmDriveTime">--</span>
+                        </button>
+                    </div>
+                    <div class="firstmile-note" id="firstMileNote"></div>
                 </div>
                 <button class="filter-btn use-location-btn" id="useMyLocationBtn">
                     <i class="fa-solid fa-location-crosshairs"></i> Use My Current Location
@@ -271,6 +296,12 @@
         let originMarker = null;
         let currentDestination = null; // { type:'mall', label, sub, mall } or { type:'station', label, name }
 
+        // Set whenever the origin is a free-text/geo place rather than an actual station picked
+        // from the list. Holds both walking and driving estimates for the "first mile" leg from
+        // that place to the nearest station, plus which mode the user currently has selected.
+        // null whenever the origin IS a real station (no first-mile leg needed).
+        let originFirstMile = null; // { meters, walkMins, driveMins, mode: 'walk'|'drive', stationName, label, lat, lng }
+
         // Rough time assumptions for KV rail (used only to produce an estimate, not live schedule data).
         // IMPORTANT: this map only lists a curated subset of each line's real stations, so a "hop"
         // between two listed stations can quietly span several real stations and many km. Timing must
@@ -289,6 +320,14 @@
         // from straight-line coordinates instead of real track geometry. 1.25 reproduces official
         // end-to-end line times closely when checked against the Kajang Line's published ~51km/~70min.
         const TRACK_CURVE_FACTOR = 1.25;
+
+        // --- FIRST-MILE (origin place -> nearest station) walk/drive assumptions ---
+        const WALK_SPEED_MPM = 80;          // ~80 metres per minute walking pace
+        const DRIVING_SPEED_KMH = 25;       // average urban driving speed incl. traffic/lights (KV roads)
+        const DRIVE_ROAD_FACTOR = 1.4;      // straight-line -> real road-distance correction (roads aren't straight)
+        const DRIVE_OVERHEAD_MIN = 6;       // fixed overhead: unparking/parking, or waiting for a Grab to arrive
+        // Distance beyond which we default to suggesting "Drive" instead of "Walk" for the first mile
+        const FIRST_MILE_DRIVE_SUGGEST_METERS = 900;
 
         // Real official figures: line length (km) / (official station count - 1) = average real gap.
         // Source: MRT Corp / Rapid KL published line lengths and station counts.
@@ -338,6 +377,15 @@
                 impliedStops += h.impliedStops;
             }
             return { minutes: runningMin, runningMin, dwellMin, impliedStops };
+        }
+
+        // Estimates walk AND drive time for a straight-line distance (metres) from an origin place
+        // to the station that will be used to board the rail network.
+        function estimateFirstMile(meters) {
+            const walkMins = Math.max(1, Math.round(meters / WALK_SPEED_MPM));
+            const roadKm = (meters / 1000) * DRIVE_ROAD_FACTOR;
+            const driveMins = Math.max(1, Math.round((roadKm / DRIVING_SPEED_KMH) * 60 + DRIVE_OVERHEAD_MIN));
+            return { walkMins, driveMins };
         }
 
         function clearRouteLayers() {
@@ -439,10 +487,6 @@
             },
             {
                 name: "MRT Putrajaya Line", color: "#FFD100",
-                // NOTE: order and names verified against MRT Corp's official station list. Coordinates
-                // for the Sri Damansara/Kepong/Jinjang/Sentul stretch are approximate placements along
-                // the real road corridor (only Sri Damansara Barat is an exact surveyed coordinate) —
-                // good enough for routing/hop-count/distance purposes, not survey-grade precision.
                 stations: [
                     { name: "Kwasa Damansara", lat: 3.1765, lng: 101.5724, int: true },
                     { name: "Kampung Selamat", lat: 3.1934, lng: 101.5752, int: false },
@@ -714,8 +758,27 @@
             return segments;
         }
 
+        // Renders the "first mile" step HTML (origin place -> boarding station), used when the
+        // origin is a free-text/geo place rather than a station picked directly from the list.
+        function firstMileStepHTML() {
+            if (!originFirstMile) return '';
+            const mode = originFirstMile.mode;
+            const icon = mode === 'drive' ? 'fa-car' : 'fa-person-walking';
+            const verb = mode === 'drive' ? 'Drive / Grab' : 'Walk';
+            const mins = mode === 'drive' ? originFirstMile.driveMins : originFirstMile.walkMins;
+            return `
+                <i class="fa-solid ${icon}" style="color:#f59e0b; margin-top:3px; font-size:0.85rem;"></i>
+                <div><strong style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">0. ${verb} to Station</strong><br><span style="color:var(--text-main);">${originFirstMile.label} → ${originFirstMile.stationName}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">~${mins} min ${mode === 'drive' ? 'drive' : 'walk'} (${Math.round(originFirstMile.meters)}m, estimated)</span></div>
+            `;
+        }
+
+        function firstMileMinutes() {
+            if (!originFirstMile) return 0;
+            return originFirstMile.mode === 'drive' ? originFirstMile.driveMins : originFirstMile.walkMins;
+        }
+
         function buildJourneyHTML(destLabel, mall, segments, rideMins, transferMins, walkMins, totalMins, fallbackMeters = null, totalStops = 0) {
-            let stepsHTML = '';
+            let stepsHTML = firstMileStepHTML();
             let stepNum = 1;
             segments.forEach((seg, idx) => {
                 const icon = idx === 0 ? 'fa-train-tram' : 'fa-right-left';
@@ -745,6 +808,8 @@
             }
 
             const transferCount = segments.length - 1;
+            const firstMileMins = originFirstMile ? firstMileMinutes() : 0;
+            const firstMileLabel = originFirstMile ? (originFirstMile.mode === 'drive' ? ' + ' + firstMileMins + ' min drive to station' : ' + ' + firstMileMins + ' min walk to station') : '';
 
             return `
                 <h3 style="margin:0 0 10px 0; color:var(--text-main); font-size:1rem; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
@@ -758,7 +823,7 @@
                     ${stepsHTML}
                 </div>
                 <div style="font-size:0.7rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:8px;">
-                    ${rideMins} min ride${totalStops > 0 ? ` (~${totalStops} station stop${totalStops > 1 ? 's' : ''})` : ''}${transferCount > 0 ? ` + ${transferMins} min transfer${transferCount > 1 ? 's' : ''}` : ''}${mall ? ` + ${walkMins} min walk` : ''}. Estimate only — actual time varies with train frequency and interchange distance.
+                    ${firstMileMins > 0 ? `${firstMileMins} min ${originFirstMile.mode} to station + ` : ''}${rideMins} min ride${totalStops > 0 ? ` (~${totalStops} station stop${totalStops > 1 ? 's' : ''})` : ''}${transferCount > 0 ? ` + ${transferMins} min transfer${transferCount > 1 ? 's' : ''}` : ''}${mall ? ` + ${walkMins} min walk` : ''}. Estimate only — actual time varies with train frequency, traffic, and interchange distance.
                 </div>
             `;
         }
@@ -875,8 +940,8 @@
                 return;
             }
 
-            // Already there
-            if (originStation === destStationName) {
+            // Already there (only possible when origin IS the exact station, i.e. no first-mile leg)
+            if (originStation === destStationName && !originFirstMile) {
                 if (mall) {
                     const walkLine = L.polyline(
                         [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
@@ -902,6 +967,25 @@
                 return;
             }
 
+            // Special case: origin is a geo place whose nearest station IS the destination station.
+            // No rail ride needed at all — just the first-mile leg (walk/drive) straight to the mall's station,
+            // then the last-mile walk into the mall.
+            if (originStation === destStationName && originFirstMile) {
+                const fmMins = firstMileMinutes();
+                let walkMins = 0;
+                if (mall) {
+                    const walkLine = L.polyline(
+                        [[stationIndex[destStationName].lat, stationIndex[destStationName].lng], [destLat, destLon]],
+                        { color: '#6366f1', weight: 4, dashArray: '5, 8' }
+                    ).addTo(map);
+                    activeRouteLayers.push(walkLine);
+                    walkMins = usedFallbackStation ? Math.max(1, Math.round(fallbackWalkMeters / 80)) : (mall.walking_time_mins || 5);
+                }
+                const totalMins = fmMins + walkMins;
+                document.getElementById('routePreview').innerHTML = buildJourneyHTML(destLabel, mall, [], 0, 0, walkMins, totalMins, usedFallbackStation ? fallbackWalkMeters : null, 0);
+                return;
+            }
+
             // Real multi-stop / multi-line route
             const path = findRoute(originStation, destStationName);
             if (!path) {
@@ -917,6 +1001,16 @@
                 const routeLine = L.polyline(coords, { color: seg.line.color, weight: 6, opacity: 0.95 }).addTo(map);
                 activeRouteLayers.push(routeLine);
             });
+
+            // Draw the first-mile leg (origin place -> boarding station) when applicable
+            if (originFirstMile) {
+                const fmColor = originFirstMile.mode === 'drive' ? '#f59e0b' : '#10b981';
+                const fmLine = L.polyline(
+                    [[originFirstMile.lat, originFirstMile.lng], [stationIndex[originStation].lat, stationIndex[originStation].lng]],
+                    { color: fmColor, weight: 4, dashArray: '2, 8' }
+                ).addTo(map);
+                activeRouteLayers.push(fmLine);
+            }
 
             let walkMins = 0;
             if (mall) {
@@ -936,7 +1030,8 @@
             });
             const rideMins = Math.round(rideMinsRaw);
             const transferMins = (segments.length - 1) * TRANSFER_PENALTY;
-            const totalMins = rideMins + transferMins + walkMins;
+            const fmMins = firstMileMinutes();
+            const totalMins = fmMins + rideMins + transferMins + walkMins;
 
             document.getElementById('routePreview').innerHTML = buildJourneyHTML(destLabel, mall, segments, rideMins, transferMins, walkMins, totalMins, usedFallbackStation ? fallbackWalkMeters : null, totalImpliedStops);
         }
@@ -962,6 +1057,8 @@
         function setOriginStation(name) {
             if (!stationIndex[name]) return;
             originStation = name;
+            originFirstMile = null; // picked a real station directly -> no first-mile leg
+            document.getElementById('firstMileToggle').style.display = 'none';
             const info = stationIndex[name];
             const lineNames = [...new Set(info.lines.map(l => l.name))].join(' / ');
 
@@ -1116,6 +1213,34 @@
             });
         }
 
+        // Renders / refreshes the Walk vs Drive toggle for the current geo-based first-mile leg
+        function renderFirstMileToggle() {
+            const toggle = document.getElementById('firstMileToggle');
+            if (!originFirstMile) { toggle.style.display = 'none'; return; }
+
+            toggle.style.display = 'block';
+            document.getElementById('fmWalkTime').textContent = `~${originFirstMile.walkMins} min`;
+            document.getElementById('fmDriveTime').textContent = `~${originFirstMile.driveMins} min`;
+
+            document.getElementById('fmWalkBtn').classList.toggle('active', originFirstMile.mode === 'walk');
+            document.getElementById('fmDriveBtn').classList.toggle('active', originFirstMile.mode === 'drive');
+
+            const note = document.getElementById('firstMileNote');
+            note.textContent = originFirstMile.meters > FIRST_MILE_DRIVE_SUGGEST_METERS
+                ? `${Math.round(originFirstMile.meters)}m away — driving or grabbing a ride to the station is usually faster here.`
+                : `${Math.round(originFirstMile.meters)}m away — an easy walk to the station.`;
+        }
+
+        function setFirstMileMode(mode) {
+            if (!originFirstMile) return;
+            originFirstMile.mode = mode;
+            renderFirstMileToggle();
+            if (currentDestination) showRouteToDestination(currentDestination);
+        }
+
+        document.getElementById('fmWalkBtn').addEventListener('click', () => setFirstMileMode('walk'));
+        document.getElementById('fmDriveBtn').addEventListener('click', () => setFirstMileMode('drive'));
+
         function setOriginFromGeo(label, lat, lng) {
             // Find the closest transit station to the chosen place
             const userLatLng = L.latLng(lat, lng);
@@ -1133,13 +1258,30 @@
                 .bindPopup(`<strong>Your Starting Point</strong><br>${label}`);
             map.flyTo([lat, lng], 14, { duration: 1 });
 
+            // Estimate both walk and drive times for this first-mile leg, and default to
+            // whichever makes more sense given the distance (driving wins past ~900m).
+            const { walkMins, driveMins } = estimateFirstMile(shortest);
+            const defaultMode = shortest > FIRST_MILE_DRIVE_SUGGEST_METERS ? 'drive' : 'walk';
+
+            originFirstMile = {
+                meters: shortest,
+                walkMins, driveMins,
+                mode: defaultMode,
+                stationName: closestStation,
+                label,
+                lat, lng
+            };
+
             // Route via the nearest station, but show the human-friendly label
             originStation = closestStation;
-            const walkDist = Math.round(shortest);
-            const walkMins = Math.max(1, Math.round(shortest / 80)); // ~80 m per minute walking
+            const activeMins = defaultMode === 'drive' ? driveMins : walkMins;
+            const modeIcon = defaultMode === 'drive' ? '🚗' : '🚶';
             document.getElementById('originBadgeText').innerHTML =
-                `&#128205; ${label}<br><span style="font-size:0.7rem; color:var(--text-muted);">Nearest station: <strong>${closestStation}</strong> (~${walkMins} min walk, ${walkDist}m)</span>`;
+                `&#128205; ${label}<br><span style="font-size:0.7rem; color:var(--text-muted);">Nearest station: <strong>${closestStation}</strong> (${modeIcon} ~${activeMins} min ${defaultMode})</span>`;
             document.getElementById('originBadge').style.display = 'flex';
+
+            renderFirstMileToggle();
+
             clearRouteLayers();
             if (currentDestination) showRouteToDestination(currentDestination);
         }
@@ -1148,7 +1290,9 @@
 
         document.getElementById('originClearBtn').addEventListener('click', () => {
             originStation = null;
+            originFirstMile = null;
             document.getElementById('originBadge').style.display = 'none';
+            document.getElementById('firstMileToggle').style.display = 'none';
             if (originMarker) { map.removeLayer(originMarker); originMarker = null; }
             clearRouteLayers();
             document.getElementById('routePreview').innerHTML = currentDestination
@@ -1162,15 +1306,11 @@
 
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
             navigator.geolocation.getCurrentPosition((pos) => {
-                const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-                let closestStation = null; let shortest = Infinity;
-                allStationNames.forEach(name => {
-                    const info = stationIndex[name];
-                    const dist = map.distance(userLatLng, [info.lat, info.lng]);
-                    if (dist < shortest) { shortest = dist; closestStation = name; }
-                });
                 btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use My Current Location';
-                if (closestStation) setOriginStation(closestStation);
+                // Treat GPS position exactly like a geo-searched place: it's very unlikely the user
+                // is standing exactly on a station, so route the first mile (walk or drive) properly
+                // instead of silently snapping straight onto the nearest station with no leg shown.
+                setOriginFromGeo('My Current Location', pos.coords.latitude, pos.coords.longitude);
             }, () => {
                 btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use My Current Location';
                 alert('Unable to retrieve your location. Please allow location access or search for your station manually.');
