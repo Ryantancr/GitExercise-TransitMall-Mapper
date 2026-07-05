@@ -1,852 +1,1273 @@
 [
-  {
-    "id": 1,
-    "mall_name": "The Exchange TRX",
-    "station": "TRX Station",
-    "line": "Kajang & Putrajaya Line",
-    "best_exit": "Exit B (Direct Connection)",
-    "walking_time_mins": 2,
-    "categories": [
-      "Premium",
-      "Food Court",
-      "Photography Spots"
-    ],
-    "coordinates": {
-      "lat": 3.1425,
-      "lon": 101.7190
+    {
+        "id": 1,
+        "mall_name": "The Exchange TRX",
+        "station": "TRX Station",
+        "line": "Kajang & Putrajaya Line",
+        "best_exit": "Exit B (Direct Connection)",
+        "walking_time_mins": 2,
+        "categories": [
+            "Premium",
+            "Food Court",
+            "Photography Spots"
+        ],
+        "coordinates": {
+            "lat": 3.1425,
+            "lon": 101.719
+        }
+    },
+    {
+        "id": 2,
+        "mall_name": "Pavilion Bukit Bintang",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit D (Walk through Lot 10)",
+        "walking_time_mins": 5,
+        "categories": [
+            "Cinemas",
+            "Shopping",
+            "Student Dining"
+        ],
+        "coordinates": {
+            "lat": 3.148,
+            "lon": 101.7145
+        }
+    },
+    {
+        "id": 3,
+        "mall_name": "1 Utama Shopping Centre",
+        "station": "Bandar Utama Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B (Skybridge)",
+        "walking_time_mins": 8,
+        "categories": [
+            "Entertainment",
+            "Large Variety",
+            "Good Study Spots"
+        ],
+        "coordinates": {
+            "lat": 3.1488,
+            "lon": 101.616
+        }
+    },
+    {
+        "id": 4,
+        "mall_name": "Tropicana Gardens Mall",
+        "station": "Surian Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A (Direct Link)",
+        "walking_time_mins": 1,
+        "categories": [
+            "Suburban",
+            "Groceries",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 3.1495,
+            "lon": 101.5935
+        }
+    },
+    {
+        "id": 5,
+        "mall_name": "MyTOWN Shopping Centre",
+        "station": "Cochrane Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A (Underground Link)",
+        "walking_time_mins": 2,
+        "categories": [
+            "IKEA",
+            "Family",
+            "Home Goods"
+        ],
+        "coordinates": {
+            "lat": 3.134,
+            "lon": 101.723
+        }
+    },
+    {
+        "id": 6,
+        "mall_name": "Sunway Velocity Mall",
+        "station": "Maluri Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B (Link Bridge)",
+        "walking_time_mins": 4,
+        "categories": [
+            "Dining",
+            "Entertainment",
+            "Lifestyle"
+        ],
+        "coordinates": {
+            "lat": 3.1275,
+            "lon": 101.7245
+        }
+    },
+    {
+        "id": 7,
+        "mall_name": "Suria KLCC",
+        "station": "KLCC Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit C (Direct Connection)",
+        "walking_time_mins": 3,
+        "categories": [
+            "Luxury",
+            "Landmarks",
+            "Tourism"
+        ],
+        "coordinates": {
+            "lat": 3.1585,
+            "lon": 101.7115
+        }
+    },
+    {
+        "id": 8,
+        "mall_name": "Avenue K",
+        "station": "KLCC Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A (Underground Link)",
+        "walking_time_mins": 1,
+        "categories": [
+            "Groceries",
+            "Dining",
+            "Convenience"
+        ],
+        "coordinates": {
+            "lat": 3.1595,
+            "lon": 101.714
+        }
+    },
+    {
+        "id": 9,
+        "mall_name": "Nu Sentral",
+        "station": "KL Sentral Station",
+        "line": "All Lines",
+        "best_exit": "Main Concourse",
+        "walking_time_mins": 2,
+        "categories": [
+            "Transit Hub",
+            "Fashion",
+            "Tech"
+        ],
+        "coordinates": {
+            "lat": 3.1333,
+            "lon": 101.6869
+        }
+    },
+    {
+        "id": 10,
+        "mall_name": "Mid Valley Megamall",
+        "station": "Abdullah Hukum Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Link Bridge",
+        "walking_time_mins": 10,
+        "categories": [
+            "Massive Variety",
+            "Cinemas",
+            "Crowded"
+        ],
+        "coordinates": {
+            "lat": 3.1174,
+            "lon": 101.6773
+        }
+    },
+    {
+        "id": 11,
+        "mall_name": "The Gardens Mall",
+        "station": "Abdullah Hukum Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Link Bridge",
+        "walking_time_mins": 8,
+        "categories": [
+            "Premium",
+            "Quiet",
+            "High-End Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1185,
+            "lon": 101.675
+        }
+    },
+    {
+        "id": 12,
+        "mall_name": "KL Eco City Mall",
+        "station": "Abdullah Hukum Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A (Direct Link)",
+        "walking_time_mins": 2,
+        "categories": [
+            "Groceries",
+            "Cafes",
+            "Business"
+        ],
+        "coordinates": {
+            "lat": 3.119,
+            "lon": 101.674
+        }
+    },
+    {
+        "id": 13,
+        "mall_name": "EkoCheras Mall",
+        "station": "Taman Mutiara Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A (Covered Link Bridge)",
+        "walking_time_mins": 3,
+        "categories": [
+            "Cinemas",
+            "Dining",
+            "Neighborhood"
+        ],
+        "coordinates": {
+            "lat": 3.0925,
+            "lon": 101.7405
+        }
+    },
+    {
+        "id": 14,
+        "mall_name": "Cheras Leisure Mall",
+        "station": "Taman Mutiara Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B (Link Bridge)",
+        "walking_time_mins": 4,
+        "categories": [
+            "Classic",
+            "Food Court",
+            "Local Goods"
+        ],
+        "coordinates": {
+            "lat": 3.091,
+            "lon": 101.741
+        }
+    },
+    {
+        "id": 15,
+        "mall_name": "Pavilion Damansara Heights",
+        "station": "Pusat Bandar Damansara Station",
+        "line": "Kajang Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 3,
+        "categories": [
+            "Premium",
+            "New",
+            "Lifestyle"
+        ],
+        "coordinates": {
+            "lat": 3.1445,
+            "lon": 101.662
+        }
+    },
+    {
+        "id": 16,
+        "mall_name": "Lot 10",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit D (Direct Link)",
+        "walking_time_mins": 1,
+        "categories": [
+            "Japanese Culture",
+            "Street Food",
+            "Fashion"
+        ],
+        "coordinates": {
+            "lat": 3.1465,
+            "lon": 101.7125
+        }
+    },
+    {
+        "id": 17,
+        "mall_name": "Fahrenheit88",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit D (Walk past Lot 10)",
+        "walking_time_mins": 4,
+        "categories": [
+            "Fashion",
+            "Events",
+            "Boutiques"
+        ],
+        "coordinates": {
+            "lat": 3.1475,
+            "lon": 101.7135
+        }
+    },
+    {
+        "id": 18,
+        "mall_name": "Berjaya Times Square",
+        "station": "Imbi Station",
+        "line": "Monorail Line",
+        "best_exit": "Direct Connection",
+        "walking_time_mins": 1,
+        "categories": [
+            "Theme Park",
+            "Bargains",
+            "Massive"
+        ],
+        "coordinates": {
+            "lat": 3.142,
+            "lon": 101.7095
+        }
+    },
+    {
+        "id": 19,
+        "mall_name": "Plaza Low Yat",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A (Walk through alley)",
+        "walking_time_mins": 6,
+        "categories": [
+            "Tech",
+            "Gadgets",
+            "Repairs"
+        ],
+        "coordinates": {
+            "lat": 3.144,
+            "lon": 101.71
+        }
+    },
+    {
+        "id": 20,
+        "mall_name": "LaLaport BBCC",
+        "station": "Hang Tuah Station",
+        "line": "LRT & Monorail",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 3,
+        "categories": [
+            "Japanese Retail",
+            "Aesthetics",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1415,
+            "lon": 101.706
+        }
+    },
+    {
+        "id": 21,
+        "mall_name": "Sungei Wang Plaza",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit C",
+        "walking_time_mins": 3,
+        "categories": [
+            "Budget Fashion",
+            "Vintage",
+            "Salons"
+        ],
+        "coordinates": {
+            "lat": 3.1446,
+            "lon": 101.7121
+        }
+    },
+    {
+        "id": 22,
+        "mall_name": "The Starhill",
+        "station": "Bukit Bintang Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit D (Walk past Pavilion)",
+        "walking_time_mins": 4,
+        "categories": [
+            "Ultra Luxury",
+            "Fine Dining",
+            "Watches"
+        ],
+        "coordinates": {
+            "lat": 3.1477,
+            "lon": 101.7158
+        }
+    },
+    {
+        "id": 23,
+        "mall_name": "KL Gateway Mall",
+        "station": "Universiti Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 1,
+        "categories": [
+            "Neighborhood",
+            "Groceries",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 3.1158,
+            "lon": 101.6632
+        }
+    },
+    {
+        "id": 24,
+        "mall_name": "Quill City Mall",
+        "station": "Medan Tuanku Station",
+        "line": "Monorail Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 1,
+        "categories": [
+            "Quiet",
+            "Events",
+            "University Hub"
+        ],
+        "coordinates": {
+            "lat": 3.1595,
+            "lon": 101.6998
+        }
+    },
+    {
+        "id": 25,
+        "mall_name": "Sunway Putra Mall",
+        "station": "PWTC Station",
+        "line": "Ampang Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 2,
+        "categories": [
+            "Family",
+            "Dining",
+            "Fashion"
+        ],
+        "coordinates": {
+            "lat": 3.1616,
+            "lon": 101.6946
+        }
+    },
+    {
+        "id": 26,
+        "mall_name": "Sogo KL",
+        "station": "Bandaraya Station",
+        "line": "Ampang Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 1,
+        "categories": [
+            "Department Store",
+            "Sales",
+            "Cosmetics"
+        ],
+        "coordinates": {
+            "lat": 3.1561,
+            "lon": 101.695
+        }
+    },
+    {
+        "id": 27,
+        "mall_name": "Central Market",
+        "station": "Pasar Seni Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 4,
+        "categories": [
+            "Cultural",
+            "Handicrafts",
+            "Tourism"
+        ],
+        "coordinates": {
+            "lat": 3.1454,
+            "lon": 101.6953
+        }
+    },
+    {
+        "id": 28,
+        "mall_name": "IOI Mall Puchong",
+        "station": "IOI Puchong Jaya Station",
+        "line": "Sri Petaling Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 3,
+        "categories": [
+            "Suburban Massive",
+            "Entertainment",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.0452,
+            "lon": 101.6186
+        }
+    },
+    {
+        "id": 29,
+        "mall_name": "SetiaWalk",
+        "station": "Pusat Bandar Puchong Station",
+        "line": "Sri Petaling Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 8,
+        "categories": [
+            "Outdoor Concept",
+            "Bars",
+            "Cinemas"
+        ],
+        "coordinates": {
+            "lat": 3.0315,
+            "lon": 101.6171
+        }
+    },
+    {
+        "id": 30,
+        "mall_name": "Main Place Mall",
+        "station": "USJ 21 Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 5,
+        "categories": [
+            "Neighborhood",
+            "Food Court",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 3.0255,
+            "lon": 101.5815
+        }
+    },
+    {
+        "id": 31,
+        "mall_name": "Da Men Mall",
+        "station": "USJ 7 Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 5,
+        "categories": [
+            "Asian Culture",
+            "Hobbies",
+            "Food Street"
+        ],
+        "coordinates": {
+            "lat": 3.0592,
+            "lon": 101.5936
+        }
+    },
+    {
+        "id": 32,
+        "mall_name": "Summit USJ",
+        "station": "USJ 7 Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit B (Walk past Da Men)",
+        "walking_time_mins": 7,
+        "categories": [
+            "Bargains",
+            "Bowling",
+            "Books"
+        ],
+        "coordinates": {
+            "lat": 3.0598,
+            "lon": 101.5948
+        }
+    },
+    {
+        "id": 33,
+        "mall_name": "Empire Shopping Gallery",
+        "station": "Subang Jaya Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 7,
+        "categories": [
+            "Premium",
+            "Boutiques",
+            "Bakeries"
+        ],
+        "coordinates": {
+            "lat": 3.082,
+            "lon": 101.583
+        }
+    },
+    {
+        "id": 34,
+        "mall_name": "Subang Parade",
+        "station": "Subang Jaya Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 5,
+        "categories": [
+            "Classic",
+            "Tech",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 3.0818,
+            "lon": 101.5855
+        }
+    },
+    {
+        "id": 35,
+        "mall_name": "Amcorp Mall",
+        "station": "Taman Jaya Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 3,
+        "categories": [
+            "Flea Market",
+            "Antiques",
+            "Collectibles"
+        ],
+        "coordinates": {
+            "lat": 3.1046,
+            "lon": 101.6465
+        }
+    },
+    {
+        "id": 36,
+        "mall_name": "Glo Damansara",
+        "station": "TTDI Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 4,
+        "categories": [
+            "Quiet",
+            "Specialty Dining",
+            "Supermarket"
+        ],
+        "coordinates": {
+            "lat": 3.1335,
+            "lon": 101.6293
+        }
+    },
+    {
+        "id": 37,
+        "mall_name": "3 Damansara",
+        "station": "TTDI Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 10,
+        "categories": [
+            "Family",
+            "Cinemas",
+            "Pets"
+        ],
+        "coordinates": {
+            "lat": 3.1305,
+            "lon": 101.6264
+        }
+    },
+    {
+        "id": 38,
+        "mall_name": "The Curve",
+        "station": "Mutiara Damansara Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 5,
+        "categories": [
+            "Outdoor Street",
+            "Events",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1578,
+            "lon": 101.6115
+        }
+    },
+    {
+        "id": 39,
+        "mall_name": "IPC Shopping Centre",
+        "station": "Mutiara Damansara Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 6,
+        "categories": [
+            "IKEA",
+            "Family",
+            "Eco-friendly"
+        ],
+        "coordinates": {
+            "lat": 3.1565,
+            "lon": 101.611
+        }
+    },
+    {
+        "id": 40,
+        "mall_name": "AEON Style Taman Maluri",
+        "station": "Maluri Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 5,
+        "categories": [
+            "Supermarket",
+            "Japanese Goods",
+            "Bakery"
+        ],
+        "coordinates": {
+            "lat": 3.1256,
+            "lon": 101.7289
+        }
+    },
+    {
+        "id": 41,
+        "mall_name": "Datum Jelatek",
+        "station": "Jelatek Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 1,
+        "categories": [
+            "New",
+            "Aesthetics",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 3.167,
+            "lon": 101.7375
+        }
+    },
+    {
+        "id": 42,
+        "mall_name": "Great Eastern Mall",
+        "station": "Jelatek Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 12,
+        "categories": [
+            "Expat Hub",
+            "Quiet",
+            "Books"
+        ],
+        "coordinates": {
+            "lat": 3.1601,
+            "lon": 101.737
+        }
+    },
+    {
+        "id": 43,
+        "mall_name": "Wangsa Walk Mall",
+        "station": "Sri Rampai Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 5,
+        "categories": [
+            "Suburban",
+            "Bowling",
+            "Cinemas"
+        ],
+        "coordinates": {
+            "lat": 3.1983,
+            "lon": 101.7408
+        }
+    },
+    {
+        "id": 44,
+        "mall_name": "AEON Alpha Angle",
+        "station": "Wangsa Maju Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 6,
+        "categories": [
+            "Classic",
+            "Groceries",
+            "Affordable"
+        ],
+        "coordinates": {
+            "lat": 3.2045,
+            "lon": 101.7323
+        }
+    },
+    {
+        "id": 45,
+        "mall_name": "The Intermark Mall",
+        "station": "Ampang Park Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 3,
+        "categories": [
+            "Business Hub",
+            "Food Court",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 3.1617,
+            "lon": 101.7196
+        }
+    },
+    {
+        "id": 46,
+        "mall_name": "Four Seasons Place",
+        "station": "KLCC Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit C (Walk past Avenue K)",
+        "walking_time_mins": 3,
+        "categories": [
+            "Ultra Luxury",
+            "Fine Dining",
+            "Boutiques"
+        ],
+        "coordinates": {
+            "lat": 3.158,
+            "lon": 101.7135
+        }
+    },
+    {
+        "id": 47,
+        "mall_name": "Evolve Concept Mall",
+        "station": "Ara Damansara Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 5,
+        "categories": [
+            "Quiet",
+            "Events",
+            "Offices"
+        ],
+        "coordinates": {
+            "lat": 3.1118,
+            "lon": 101.5866
+        }
+    },
+    {
+        "id": 48,
+        "mall_name": "Citta Mall",
+        "station": "Ara Damansara Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 12,
+        "categories": [
+            "Open Air",
+            "Groceries",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 3.1115,
+            "lon": 101.5818
+        }
+    },
+    {
+        "id": 49,
+        "mall_name": "AEON Mall Metro Prima",
+        "station": "Metro Prima Station",
+        "line": "Putrajaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 3,
+        "categories": [
+            "Supermarket",
+            "Family",
+            "Local Goods"
+        ],
+        "coordinates": {
+            "lat": 3.2136,
+            "lon": 101.6394
+        }
+    },
+    {
+        "id": 50,
+        "mall_name": "KWC Fashion Wholesale",
+        "station": "Hang Tuah Station",
+        "line": "Ampang Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 8,
+        "categories": [
+            "Wholesale",
+            "Fashion",
+            "Bargains"
+        ],
+        "coordinates": {
+            "lat": 3.1363,
+            "lon": 101.7083
+        }
+    },
+    {
+        "id": 51,
+        "mall_name": "Sunway Pyramid",
+        "station": "Sunway Lagoon Station",
+        "line": "BRT Sunway Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 2,
+        "categories": [
+            "Theme Park",
+            "Massive",
+            "Entertainment"
+        ],
+        "coordinates": {
+            "lat": 3.0731,
+            "lon": 101.607
+        }
+    },
+    {
+        "id": 52,
+        "mall_name": "IOI City Mall",
+        "station": "Putrajaya Sentral",
+        "line": "Putrajaya Line",
+        "best_exit": "Main Exit (Take Nadi Putra Bus / T523)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Massive",
+            "Ice Skating",
+            "Entertainment"
+        ],
+        "coordinates": {
+            "lat": 2.9698,
+            "lon": 101.713
+        }
+    },
+    {
+        "id": 53,
+        "mall_name": "DPULZE Shopping Centre",
+        "station": "Cyberjaya City Centre",
+        "line": "Putrajaya Line",
+        "best_exit": "Exit A (Take Feeder Bus T504)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Local Hub",
+            "Cinemas",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 2.9221,
+            "lon": 101.6509
+        }
+    },
+    {
+        "id": 54,
+        "mall_name": "Tamarind Square",
+        "station": "Cyberjaya Utara",
+        "line": "Putrajaya Line",
+        "best_exit": "Exit A (Take Feeder Bus)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Aesthetics",
+            "BookXcess",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 2.9168,
+            "lon": 101.6375
+        }
+    },
+    {
+        "id": 55,
+        "mall_name": "Plaza Arkadia",
+        "station": "Sri Damansara Sentral",
+        "line": "Putrajaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 15,
+        "categories": [
+            "Pet Friendly",
+            "Outdoor Concept",
+            "Bars"
+        ],
+        "coordinates": {
+            "lat": 3.1873,
+            "lon": 101.636
+        }
+    },
+    {
+        "id": 56,
+        "mall_name": "United Point Shopping Centre",
+        "station": "Sri Damansara Timur",
+        "line": "Putrajaya Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 3,
+        "categories": [
+            "Neighborhood",
+            "Groceries",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1904,
+            "lon": 101.6429
+        }
+    },
+    {
+        "id": 57,
+        "mall_name": "KL East Mall",
+        "station": "Gombak Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Direct Link Bridge",
+        "walking_time_mins": 5,
+        "categories": [
+            "Lifestyle",
+            "Ice Skating",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.2235,
+            "lon": 101.7259
+        }
+    },
+    {
+        "id": 58,
+        "mall_name": "Pavilion Bukit Jalil",
+        "station": "Awan Besar Station",
+        "line": "Sri Petaling Line",
+        "best_exit": "Exit A (Take Free Shuttle Bus)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Premium",
+            "Massive",
+            "Events"
+        ],
+        "coordinates": {
+            "lat": 3.0504,
+            "lon": 101.6695
+        }
+    },
+    {
+        "id": 59,
+        "mall_name": "The Starling",
+        "station": "TTDI Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit A (Take Free Shuttle Bus)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Nature Concept",
+            "Cinemas",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1345,
+            "lon": 101.6225
+        }
+    },
+    {
+        "id": 60,
+        "mall_name": "Paradigm Mall",
+        "station": "Kelana Jaya Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Main Exit (Take Free Shuttle Bus)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Family",
+            "Cinemas",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1051,
+            "lon": 101.5958
+        }
+    },
+    {
+        "id": 61,
+        "mall_name": "Melawati Mall",
+        "station": "Sri Rampai Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Main Exit (Take Feeder Bus T221)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Lifestyle",
+            "Cinemas",
+            "Local Goods"
+        ],
+        "coordinates": {
+            "lat": 3.2105,
+            "lon": 101.7484
+        }
+    },
+    {
+        "id": 62,
+        "mall_name": "Jaya Shopping Centre",
+        "station": "Asia Jaya Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 10,
+        "categories": [
+            "Classic",
+            "Supermarket",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.111,
+            "lon": 101.6375
+        }
+    },
+    {
+        "id": 63,
+        "mall_name": "Atria Shopping Gallery",
+        "station": "Taman Bahagia Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Main Exit (Take Feeder Bus T813)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Events",
+            "Family",
+            "Premium Groceries"
+        ],
+        "coordinates": {
+            "lat": 3.1274,
+            "lon": 101.6166
+        }
+    },
+    {
+        "id": 64,
+        "mall_name": "Publika Shopping Gallery",
+        "station": "Semantan Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B (Take Feeder Bus T821)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Art & Culture",
+            "Expat Hub",
+            "Cafes"
+        ],
+        "coordinates": {
+            "lat": 3.1706,
+            "lon": 101.6663
+        }
+    },
+    {
+        "id": 65,
+        "mall_name": "Gateway@klia2",
+        "station": "klia2 Station",
+        "line": "ERL KLIA Transit",
+        "best_exit": "Main Concourse",
+        "walking_time_mins": 1,
+        "categories": [
+            "Transit Hub",
+            "Travel",
+            "24-Hour Dining"
+        ],
+        "coordinates": {
+            "lat": 2.7441,
+            "lon": 101.6865
+        }
+    },
+    {
+        "id": 66,
+        "mall_name": "Mitsui Outlet Park",
+        "station": "KLIA Terminal 1 Station",
+        "line": "ERL KLIA Transit",
+        "best_exit": "Level 1 Door 2 (Free Shuttle Bus)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Factory Outlet",
+            "Fashion",
+            "Travel"
+        ],
+        "coordinates": {
+            "lat": 2.7668,
+            "lon": 101.6672
+        }
+    },
+    {
+        "id": 67,
+        "mall_name": "Central i-City",
+        "station": "Padang Jawa Station",
+        "line": "KTM Pelabuhan Klang Line",
+        "best_exit": "Main Exit (Take Smart Selangor Bus)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Theme Park",
+            "Thai Concept",
+            "Massive"
+        ],
+        "coordinates": {
+            "lat": 3.0641,
+            "lon": 101.4837
+        }
+    },
+    {
+        "id": 68,
+        "mall_name": "The Mines Shopping Mall",
+        "station": "Serdang Station",
+        "line": "KTM Seremban Line",
+        "best_exit": "Main Exit (Short Walk)",
+        "walking_time_mins": 8,
+        "categories": [
+            "Canal Boat",
+            "Tech",
+            "Bargains"
+        ],
+        "coordinates": {
+            "lat": 3.0275,
+            "lon": 101.7176
+        }
+    },
+    {
+        "id": 69,
+        "mall_name": "Alamanda Shopping Centre",
+        "station": "Putrajaya Sentral",
+        "line": "Putrajaya Line",
+        "best_exit": "Main Exit (Take Nadi Putra Bus P103)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Family",
+            "Suburban",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 2.9392,
+            "lon": 101.7011
+        }
+    },
+    {
+        "id": 70,
+        "mall_name": "Bangsar Village",
+        "station": "Bank Rakyat Bangsar Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 12,
+        "categories": [
+            "Expat Hub",
+            "Groceries",
+            "Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1302,
+            "lon": 101.6708
+        }
+    },
+    {
+        "id": 71,
+        "mall_name": "The Sphere (Bangsar South)",
+        "station": "Universiti Station",
+        "line": "Kelana Jaya Line",
+        "best_exit": "Exit A",
+        "walking_time_mins": 8,
+        "categories": [
+            "Business Hub",
+            "Cafes",
+            "Groceries"
+        ],
+        "coordinates": {
+            "lat": 3.1119,
+            "lon": 101.6653
+        }
+    },
+    {
+        "id": 72,
+        "mall_name": "AEON Mall Shah Alam",
+        "station": "Batu Tiga Station",
+        "line": "KTM Pelabuhan Klang Line",
+        "best_exit": "Main Exit (Take Smart Selangor Bus)",
+        "walking_time_mins": 10,
+        "categories": [
+            "Supermarket",
+            "Japanese Goods",
+            "Family"
+        ],
+        "coordinates": {
+            "lat": 3.0766,
+            "lon": 101.5471
+        }
+    },
+    {
+        "id": 73,
+        "mall_name": "The LINC KL",
+        "station": "Ampang Park Station",
+        "line": "Kelana Jaya & Putrajaya Line",
+        "best_exit": "Exit B",
+        "walking_time_mins": 3,
+        "categories": [
+            "Aesthetics",
+            "Eco-friendly",
+            "Events"
+        ],
+        "coordinates": {
+            "lat": 3.1607,
+            "lon": 101.7196
+        }
+    },
+    {
+        "id": 74,
+        "mall_name": "1 Mont Kiara",
+        "station": "Semantan Station",
+        "line": "Kajang Line",
+        "best_exit": "Exit B (Take Feeder Bus T852)",
+        "walking_time_mins": 15,
+        "categories": [
+            "Expat Hub",
+            "Fitness",
+            "Specialty Dining"
+        ],
+        "coordinates": {
+            "lat": 3.1662,
+            "lon": 101.6527
+        }
+    },
+    {
+        "mall_name": "AEON BiG Subang Jaya",
+        "station": "Subang Jaya Station",
+        "line": "Kelana Jaya Line",
+        "latitude": 3.0811,
+        "longitude": 101.5878,
+        "categories": [
+            "grocery",
+            "cinema",
+            "study"
+        ],
+        "id": 75
     }
-  },
-  {
-    "id": 2,
-    "mall_name": "Pavilion Bukit Bintang",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit D (Walk through Lot 10)",
-    "walking_time_mins": 5,
-    "categories": [
-      "Cinemas",
-      "Shopping",
-      "Student Dining"
-    ],
-    "coordinates": {
-      "lat": 3.1480,
-      "lon": 101.7145
-    }
-  },
-  {
-    "id": 3,
-    "mall_name": "1 Utama Shopping Centre",
-    "station": "Bandar Utama Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit B (Skybridge)",
-    "walking_time_mins": 8,
-    "categories": [
-      "Entertainment",
-      "Large Variety",
-      "Good Study Spots"
-    ],
-    "coordinates": {
-      "lat": 3.1488,
-      "lon": 101.6160
-    }
-  },
-  {
-    "id": 4,
-    "mall_name": "Tropicana Gardens Mall",
-    "station": "Surian Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A (Direct Link)",
-    "walking_time_mins": 1,
-    "categories": [
-      "Suburban",
-      "Groceries",
-      "Cafes"
-    ],
-    "coordinates": {
-      "lat": 3.1495,
-      "lon": 101.5935
-    }
-  },
-  {
-    "id": 5,
-    "mall_name": "MyTOWN Shopping Centre",
-    "station": "Cochrane Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A (Underground Link)",
-    "walking_time_mins": 2,
-    "categories": [
-      "IKEA",
-      "Family",
-      "Home Goods"
-    ],
-    "coordinates": {
-      "lat": 3.1340,
-      "lon": 101.7230
-    }
-  },
-  {
-    "id": 6,
-    "mall_name": "Sunway Velocity Mall",
-    "station": "Maluri Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit B (Link Bridge)",
-    "walking_time_mins": 4,
-    "categories": [
-      "Dining",
-      "Entertainment",
-      "Lifestyle"
-    ],
-    "coordinates": {
-      "lat": 3.1275,
-      "lon": 101.7245
-    }
-  },
-  {
-    "id": 7,
-    "mall_name": "Suria KLCC",
-    "station": "KLCC Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit C (Direct Connection)",
-    "walking_time_mins": 3,
-    "categories": [
-      "Luxury",
-      "Landmarks",
-      "Tourism"
-    ],
-    "coordinates": {
-      "lat": 3.1585,
-      "lon": 101.7115
-    }
-  },
-  {
-    "id": 8,
-    "mall_name": "Avenue K",
-    "station": "KLCC Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A (Underground Link)",
-    "walking_time_mins": 1,
-    "categories": [
-      "Groceries",
-      "Dining",
-      "Convenience"
-    ],
-    "coordinates": {
-      "lat": 3.1595,
-      "lon": 101.7140
-    }
-  },
-  {
-    "id": 9,
-    "mall_name": "Nu Sentral",
-    "station": "KL Sentral Station",
-    "line": "All Lines",
-    "best_exit": "Main Concourse",
-    "walking_time_mins": 2,
-    "categories": [
-      "Transit Hub",
-      "Fashion",
-      "Tech"
-    ],
-    "coordinates": {
-      "lat": 3.1333,
-      "lon": 101.6869
-    }
-  },
-  {
-    "id": 10,
-    "mall_name": "Mid Valley Megamall",
-    "station": "Abdullah Hukum Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Link Bridge",
-    "walking_time_mins": 10,
-    "categories": [
-      "Massive Variety",
-      "Cinemas",
-      "Crowded"
-    ],
-    "coordinates": {
-      "lat": 3.1174,
-      "lon": 101.6773
-    }
-  },
-  {
-    "id": 11,
-    "mall_name": "The Gardens Mall",
-    "station": "Abdullah Hukum Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Link Bridge",
-    "walking_time_mins": 8,
-    "categories": [
-      "Premium",
-      "Quiet",
-      "High-End Dining"
-    ],
-    "coordinates": {
-      "lat": 3.1185,
-      "lon": 101.6750
-    }
-  },
-  {
-    "id": 12,
-    "mall_name": "KL Eco City Mall",
-    "station": "Abdullah Hukum Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A (Direct Link)",
-    "walking_time_mins": 2,
-    "categories": [
-      "Groceries",
-      "Cafes",
-      "Business"
-    ],
-    "coordinates": {
-      "lat": 3.1190,
-      "lon": 101.6740
-    }
-  },
-  {
-    "id": 13,
-    "mall_name": "EkoCheras Mall",
-    "station": "Taman Mutiara Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A (Covered Link Bridge)",
-    "walking_time_mins": 3,
-    "categories": [
-      "Cinemas",
-      "Dining",
-      "Neighborhood"
-    ],
-    "coordinates": {
-      "lat": 3.0925,
-      "lon": 101.7405
-    }
-  },
-  {
-    "id": 14,
-    "mall_name": "Cheras Leisure Mall",
-    "station": "Taman Mutiara Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit B (Link Bridge)",
-    "walking_time_mins": 4,
-    "categories": [
-      "Classic",
-      "Food Court",
-      "Local Goods"
-    ],
-    "coordinates": {
-      "lat": 3.0910,
-      "lon": 101.7410
-    }
-  },
-  {
-    "id": 15,
-    "mall_name": "Pavilion Damansara Heights",
-    "station": "Pusat Bandar Damansara Station",
-    "line": "Kajang Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 3,
-    "categories": [
-      "Premium",
-      "New",
-      "Lifestyle"
-    ],
-    "coordinates": {
-      "lat": 3.1445,
-      "lon": 101.6620
-    }
-  },
-  {
-    "id": 16,
-    "mall_name": "Lot 10",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit D (Direct Link)",
-    "walking_time_mins": 1,
-    "categories": [
-      "Japanese Culture",
-      "Street Food",
-      "Fashion"
-    ],
-    "coordinates": {
-      "lat": 3.1465,
-      "lon": 101.7125
-    }
-  },
-  {
-    "id": 17,
-    "mall_name": "Fahrenheit88",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit D (Walk past Lot 10)",
-    "walking_time_mins": 4,
-    "categories": [
-      "Fashion",
-      "Events",
-      "Boutiques"
-    ],
-    "coordinates": {
-      "lat": 3.1475,
-      "lon": 101.7135
-    }
-  },
-  {
-    "id": 18,
-    "mall_name": "Berjaya Times Square",
-    "station": "Imbi Station",
-    "line": "Monorail Line",
-    "best_exit": "Direct Connection",
-    "walking_time_mins": 1,
-    "categories": [
-      "Theme Park",
-      "Bargains",
-      "Massive"
-    ],
-    "coordinates": {
-      "lat": 3.1420,
-      "lon": 101.7095
-    }
-  },
-  {
-    "id": 19,
-    "mall_name": "Plaza Low Yat",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A (Walk through alley)",
-    "walking_time_mins": 6,
-    "categories": [
-      "Tech",
-      "Gadgets",
-      "Repairs"
-    ],
-    "coordinates": {
-      "lat": 3.1440,
-      "lon": 101.7100
-    }
-  },
-  {
-    "id": 20,
-    "mall_name": "LaLaport BBCC",
-    "station": "Hang Tuah Station",
-    "line": "LRT & Monorail",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 3,
-    "categories": [
-      "Japanese Retail",
-      "Aesthetics",
-      "Dining"
-    ],
-    "coordinates": {
-      "lat": 3.1415,
-      "lon": 101.7060
-    }
-  },
-  {
-    "id": 21,
-    "mall_name": "Sungei Wang Plaza",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit C",
-    "walking_time_mins": 3,
-    "categories": [
-      "Budget Fashion",
-      "Vintage",
-      "Salons"
-    ],
-    "coordinates": {
-      "lat": 3.1446,
-      "lon": 101.7121
-    }
-  },
-  {
-    "id": 22,
-    "mall_name": "The Starhill",
-    "station": "Bukit Bintang Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit D (Walk past Pavilion)",
-    "walking_time_mins": 4,
-    "categories": [
-      "Ultra Luxury",
-      "Fine Dining",
-      "Watches"
-    ],
-    "coordinates": {
-      "lat": 3.1477,
-      "lon": 101.7158
-    }
-  },
-  {
-    "id": 23,
-    "mall_name": "KL Gateway Mall",
-    "station": "Universiti Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 1,
-    "categories": [
-      "Neighborhood",
-      "Groceries",
-      "Cafes"
-    ],
-    "coordinates": {
-      "lat": 3.1158,
-      "lon": 101.6632
-    }
-  },
-  {
-    "id": 24,
-    "mall_name": "Quill City Mall",
-    "station": "Medan Tuanku Station",
-    "line": "Monorail Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 1,
-    "categories": [
-      "Quiet",
-      "Events",
-      "University Hub"
-    ],
-    "coordinates": {
-      "lat": 3.1595,
-      "lon": 101.6998
-    }
-  },
-  {
-    "id": 25,
-    "mall_name": "Sunway Putra Mall",
-    "station": "PWTC Station",
-    "line": "Ampang Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 2,
-    "categories": [
-      "Family",
-      "Dining",
-      "Fashion"
-    ],
-    "coordinates": {
-      "lat": 3.1616,
-      "lon": 101.6946
-    }
-  },
-  {
-    "id": 26,
-    "mall_name": "Sogo KL",
-    "station": "Bandaraya Station",
-    "line": "Ampang Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 1,
-    "categories": [
-      "Department Store",
-      "Sales",
-      "Cosmetics"
-    ],
-    "coordinates": {
-      "lat": 3.1561,
-      "lon": 101.6950
-    }
-  },
-  {
-    "id": 27,
-    "mall_name": "Central Market",
-    "station": "Pasar Seni Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 4,
-    "categories": [
-      "Cultural",
-      "Handicrafts",
-      "Tourism"
-    ],
-    "coordinates": {
-      "lat": 3.1454,
-      "lon": 101.6953
-    }
-  },
-  {
-    "id": 28,
-    "mall_name": "IOI Mall Puchong",
-    "station": "IOI Puchong Jaya Station",
-    "line": "Sri Petaling Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 3,
-    "categories": [
-      "Suburban Massive",
-      "Entertainment",
-      "Dining"
-    ],
-    "coordinates": {
-      "lat": 3.0452,
-      "lon": 101.6186
-    }
-  },
-  {
-    "id": 29,
-    "mall_name": "SetiaWalk",
-    "station": "Pusat Bandar Puchong Station",
-    "line": "Sri Petaling Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 8,
-    "categories": [
-      "Outdoor Concept",
-      "Bars",
-      "Cinemas"
-    ],
-    "coordinates": {
-      "lat": 3.0315,
-      "lon": 101.6171
-    }
-  },
-  {
-    "id": 30,
-    "mall_name": "Main Place Mall",
-    "station": "USJ 21 Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 5,
-    "categories": [
-      "Neighborhood",
-      "Food Court",
-      "Groceries"
-    ],
-    "coordinates": {
-      "lat": 3.0255,
-      "lon": 101.5815
-    }
-  },
-  {
-    "id": 31,
-    "mall_name": "Da Men Mall",
-    "station": "USJ 7 Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 5,
-    "categories": [
-      "Asian Culture",
-      "Hobbies",
-      "Food Street"
-    ],
-    "coordinates": {
-      "lat": 3.0592,
-      "lon": 101.5936
-    }
-  },
-  {
-    "id": 32,
-    "mall_name": "Summit USJ",
-    "station": "USJ 7 Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit B (Walk past Da Men)",
-    "walking_time_mins": 7,
-    "categories": [
-      "Bargains",
-      "Bowling",
-      "Books"
-    ],
-    "coordinates": {
-      "lat": 3.0598,
-      "lon": 101.5948
-    }
-  },
-  {
-    "id": 33,
-    "mall_name": "Empire Shopping Gallery",
-    "station": "Subang Jaya Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 7,
-    "categories": [
-      "Premium",
-      "Boutiques",
-      "Bakeries"
-    ],
-    "coordinates": {
-      "lat": 3.0820,
-      "lon": 101.5830
-    }
-  },
-  {
-    "id": 34,
-    "mall_name": "Subang Parade",
-    "station": "Subang Jaya Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 5,
-    "categories": [
-      "Classic",
-      "Tech",
-      "Groceries"
-    ],
-    "coordinates": {
-      "lat": 3.0818,
-      "lon": 101.5855
-    }
-  },
-  {
-    "id": 35,
-    "mall_name": "Amcorp Mall",
-    "station": "Taman Jaya Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 3,
-    "categories": [
-      "Flea Market",
-      "Antiques",
-      "Collectibles"
-    ],
-    "coordinates": {
-      "lat": 3.1046,
-      "lon": 101.6465
-    }
-  },
-  {
-    "id": 36,
-    "mall_name": "Glo Damansara",
-    "station": "TTDI Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 4,
-    "categories": [
-      "Quiet",
-      "Specialty Dining",
-      "Supermarket"
-    ],
-    "coordinates": {
-      "lat": 3.1335,
-      "lon": 101.6293
-    }
-  },
-  {
-    "id": 37,
-    "mall_name": "3 Damansara",
-    "station": "TTDI Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 10,
-    "categories": [
-      "Family",
-      "Cinemas",
-      "Pets"
-    ],
-    "coordinates": {
-      "lat": 3.1305,
-      "lon": 101.6264
-    }
-  },
-  {
-    "id": 38,
-    "mall_name": "The Curve",
-    "station": "Mutiara Damansara Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 5,
-    "categories": [
-      "Outdoor Street",
-      "Events",
-      "Dining"
-    ],
-    "coordinates": {
-      "lat": 3.1578,
-      "lon": 101.6115
-    }
-  },
-  {
-    "id": 39,
-    "mall_name": "IPC Shopping Centre",
-    "station": "Mutiara Damansara Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 6,
-    "categories": [
-      "IKEA",
-      "Family",
-      "Eco-friendly"
-    ],
-    "coordinates": {
-      "lat": 3.1565,
-      "lon": 101.6110
-    }
-  },
-  {
-    "id": 40,
-    "mall_name": "AEON Style Taman Maluri",
-    "station": "Maluri Station",
-    "line": "Kajang Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 5,
-    "categories": [
-      "Supermarket",
-      "Japanese Goods",
-      "Bakery"
-    ],
-    "coordinates": {
-      "lat": 3.1256,
-      "lon": 101.7289
-    }
-  },
-  {
-    "id": 41,
-    "mall_name": "Datum Jelatek",
-    "station": "Jelatek Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Direct Link Bridge",
-    "walking_time_mins": 1,
-    "categories": [
-      "New",
-      "Aesthetics",
-      "Cafes"
-    ],
-    "coordinates": {
-      "lat": 3.1670,
-      "lon": 101.7375
-    }
-  },
-  {
-    "id": 42,
-    "mall_name": "Great Eastern Mall",
-    "station": "Jelatek Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 12,
-    "categories": [
-      "Expat Hub",
-      "Quiet",
-      "Books"
-    ],
-    "coordinates": {
-      "lat": 3.1601,
-      "lon": 101.7370
-    }
-  },
-  {
-    "id": 43,
-    "mall_name": "Wangsa Walk Mall",
-    "station": "Sri Rampai Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 5,
-    "categories": [
-      "Suburban",
-      "Bowling",
-      "Cinemas"
-    ],
-    "coordinates": {
-      "lat": 3.1983,
-      "lon": 101.7408
-    }
-  },
-  {
-    "id": 44,
-    "mall_name": "AEON Alpha Angle",
-    "station": "Wangsa Maju Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 6,
-    "categories": [
-      "Classic",
-      "Groceries",
-      "Affordable"
-    ],
-    "coordinates": {
-      "lat": 3.2045,
-      "lon": 101.7323
-    }
-  },
-  {
-    "id": 45,
-    "mall_name": "The Intermark Mall",
-    "station": "Ampang Park Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 3,
-    "categories": [
-      "Business Hub",
-      "Food Court",
-      "Groceries"
-    ],
-    "coordinates": {
-      "lat": 3.1617,
-      "lon": 101.7196
-    }
-  },
-  {
-    "id": 46,
-    "mall_name": "Four Seasons Place",
-    "station": "KLCC Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit C (Walk past Avenue K)",
-    "walking_time_mins": 3,
-    "categories": [
-      "Ultra Luxury",
-      "Fine Dining",
-      "Boutiques"
-    ],
-    "coordinates": {
-      "lat": 3.1580,
-      "lon": 101.7135
-    }
-  },
-  {
-    "id": 47,
-    "mall_name": "Evolve Concept Mall",
-    "station": "Ara Damansara Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 5,
-    "categories": [
-      "Quiet",
-      "Events",
-      "Offices"
-    ],
-    "coordinates": {
-      "lat": 3.1118,
-      "lon": 101.5866
-    }
-  },
-  {
-    "id": 48,
-    "mall_name": "Citta Mall",
-    "station": "Ara Damansara Station",
-    "line": "Kelana Jaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 12,
-    "categories": [
-      "Open Air",
-      "Groceries",
-      "Cafes"
-    ],
-    "coordinates": {
-      "lat": 3.1115,
-      "lon": 101.5818
-    }
-  },
-  {
-    "id": 49,
-    "mall_name": "AEON Mall Metro Prima",
-    "station": "Metro Prima Station",
-    "line": "Putrajaya Line",
-    "best_exit": "Exit A",
-    "walking_time_mins": 3,
-    "categories": [
-      "Supermarket",
-      "Family",
-      "Local Goods"
-    ],
-    "coordinates": {
-      "lat": 3.2136,
-      "lon": 101.6394
-    }
-  },
-  {
-    "id": 50,
-    "mall_name": "KWC Fashion Wholesale",
-    "station": "Hang Tuah Station",
-    "line": "Ampang Line",
-    "best_exit": "Exit B",
-    "walking_time_mins": 8,
-    "categories": [
-      "Wholesale",
-      "Fashion",
-      "Bargains"
-    ],
-    "coordinates": {
-      "lat": 3.1363,
-      "lon": 101.7083
-    }
-  }
 ]

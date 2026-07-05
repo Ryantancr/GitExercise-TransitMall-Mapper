@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | TransitMall Mapper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 40px; color: #0f172a; display: flex; justify-content: center; }
+        .admin-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
+        h1 { margin-top: 0; color: #2563eb; font-size: 1.5rem; }
+        h2 { margin-top: 20px; font-size: 1.2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #334155; }
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        button.primary-btn { background: #0f172a; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 10px; }
+        button.primary-btn:hover { background: #2563eb; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 0.75rem; }
+        .action-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-right: 5px; }
+        .edit-btn { background-color: #3b82f6; }
+        .delete-btn { background-color: #ef4444; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #64748b; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h1 id="formTitle"><i class="fa-solid fa-plus-circle"></i> Add New Mall</h1>
+        
+        <form id="mallForm">
+            <input type="hidden" id="editMallId">
+            <div class="form-group"><label>Mall Name</label><input type="text" id="mallName" required></div>
+            <div class="form-group"><label>Station Name</label><input type="text" id="stationName" required></div>
+            <div class="form-group"><label>Transit Line</label><input type="text" id="lineName" required></div>
+            
+            <div class="form-group">
+                <label>Categories (Select all that apply)</label>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;">
+                    <label style="font-weight: normal;"><input type="checkbox" name="cat" value="grocery"> 🛒 Grocery</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="cat" value="cinema"> 🎬 Cinema</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="cat" value="study"> 📚 Study Spot</label>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group"><label>Latitude</label><input type="number" step="any" id="lat" required></div>
+                <div class="form-group"><label>Longitude</label><input type="number" step="any" id="lon" required></div>
+            </div>
+            
+            <button type="submit" class="primary-btn" id="submitBtn">Save to Database</button>
+            <button type="button" id="cancelBtn" style="display:none; background:#94a3b8; border:none; padding:10px; width:100%; border-radius:6px; color:white; margin-top:10px; cursor:pointer;">Cancel</button>
+        </form>
+
+        <h2>Live Database Editor</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Mall</th><th>Station</th><th>Actions</th></tr></thead>
+            <tbody id="dbBody"><tr><td colspan="4" style="text-align:center;">Loading...</td></tr></tbody>
+        </table>
+        <a href="homepage2.0.html" class="back-link">← Back to Map</a>
+    </div>
+
+    <script>
+        // --- 🚨 SECURITY BOUNCER START 🚨 ---
+        // If they don't have the digital VIP wristband, kick them to the login page immediately!
+        if (sessionStorage.getItem('isAdmin') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        // --- 🚨 SECURITY BOUNCER END 🚨 ---
+
+        // Update this URL if your Python terminal gives you a new Dev Tunnel link!
+        const backendUrl = "https://298t6s1c-5001.asse.devtunnels.ms/api/malls";
+        let liveData = [];
+
+        function loadData() {
+            fetch(backendUrl).then(res => res.json()).then(data => {
+                liveData = data;
+                const body = document.getElementById('dbBody');
+                body.innerHTML = data.map(m => `
+                    <tr>
+                        <td>${m.id}</td>
+                        <td>${m.mall_name}</td>
+                        <td>${m.station}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editMall(${m.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteMall(${m.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        document.getElementById('mallForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editMallId').value;
+            
+            // Collect checked categories
+            const selectedCats = Array.from(document.querySelectorAll('input[name="cat"]:checked')).map(cb => cb.value);
+            
+            const data = {
+                mall_name: document.getElementById('mallName').value,
+                station: document.getElementById('stationName').value,
+                line: document.getElementById('lineName').value,
+                latitude: parseFloat(document.getElementById('lat').value),
+                longitude: parseFloat(document.getElementById('lon').value),
+                categories: selectedCats
+            };
+
+            fetch(id ? `${backendUrl}/${id}` : backendUrl, {
+                method: id ? 'PUT' : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { resetForm(); loadData(); });
+        });
+
+        window.editMall = (id) => {
+            const m = liveData.find(x => x.id === id);
+            document.getElementById('editMallId').value = m.id;
+            document.getElementById('mallName').value = m.mall_name;
+            document.getElementById('stationName').value = m.station;
+            document.getElementById('lineName').value = m.line || '';
+            document.getElementById('lat').value = m.latitude || (m.coordinates ? m.coordinates.lat : '');
+            document.getElementById('lon').value = m.longitude || (m.coordinates ? m.coordinates.lon : '');
+            
+            // Check correct boxes
+            document.querySelectorAll('input[name="cat"]').forEach(cb => cb.checked = (m.categories || []).includes(cb.value));
+            
+            document.getElementById('submitBtn').innerText = "Update Mall";
+            document.getElementById('cancelBtn').style.display = 'block';
+        };
+
+        window.deleteMall = (id) => {
+            if(confirm('Delete this mall?')) {
+                fetch(`${backendUrl}/${id}`, {method: 'DELETE'}).then(() => loadData());
+            }
+        };
+
+        function resetForm() {
+            document.getElementById('mallForm').reset();
+            document.querySelectorAll('input[name="cat"]').forEach(cb => cb.checked = false);
+            document.getElementById('editMallId').value = '';
+            document.getElementById('submitBtn').innerText = "Save to Database";
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+        document.getElementById('cancelBtn').onclick = resetForm;
+
+        loadData();
+    </script>
+</body>
+</html>
